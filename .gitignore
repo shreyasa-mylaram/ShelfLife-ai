@@ -17,6 +17,11 @@ npm-debug.log
 *.db
 *.sqlite
 
+# Generated data (CSV files from simulator)
+*.csv
+!demo_*.csv          # Optional: keep small demo files if you want
+!requirements*.txt   # Keep small text files
+
 # IDE
 .vscode/
 .idea/
@@ -24,10 +29,14 @@ npm-debug.log
 # OS
 .DS_Store
 
-# Models
+# Models (large files)
 *.h5
 *.pkl
 *.joblib
 
 # Logs
 *.log
+
+# Docker / temporary files
+.dockerignore
+*.pid
