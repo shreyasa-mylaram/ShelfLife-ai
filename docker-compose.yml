@@ -1,0 +1,139 @@
+version: '3.8'
+
+# ============================================
+# Shelf Life AI - Production Docker Compose
+# ============================================
+# Usage:
+#   1. Copy .env.example to .env and fill in your values
+#   2. Run: docker-compose up --build
+#   3. Access:
+#       - Frontend: http://localhost:3000
+#       - Backend API: http://localhost:8000
+#       - API Docs: http://localhost:8000/docs
+# ============================================
+
+services:
+  # ---------- Databases ----------
+  postgres:
+    image: postgres:15-alpine
+    container_name: shelflife-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-shelflife}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-shelflife}
+      POSTGRES_DB: ${POSTGRES_DB:-shelflife}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shelflife}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shelflife-network
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: shelflife-influxdb
+    restart: unless-stopped
+    environment:
+      # InfluxDB v2 initialization (correct for 2.x)
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_ADMIN_USER:-admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD:-admin123}
+      DOCKER_INFLUXDB_INIT_ORG: shelflife
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_DB:-shelflife}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:-my-super-secret-token}
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shelflife-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: shelflife-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --appendfsync everysec
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shelflife-network
+
+  # ---------- Backend (FastAPI) ----------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shelflife-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-shelflife}:${POSTGRES_PASSWORD:-shelflife}@postgres:5432/${POSTGRES_DB:-shelflife}
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-my-super-secret-token}
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-in-production}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      DEMO_MODE: ${DEMO_MODE:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      # Development hot-reload only – comment out for production
+      - ./backend:/app
+    networks:
+      - shelflife-network
+
+  # ---------- Frontend (React) ----------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: shelflife-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8000
+      - REACT_APP_MAPBOX_TOKEN=${MAPBOX_TOKEN}
+    depends_on:
+      - backend
+    networks:
+      - shelflife-network
+
+# ---------- Volumes ----------
+volumes:
+  postgres_data:
+  influxdb_data:
+  redis_data:
+
+# ---------- Networks ----------
+networks:
+  shelflife-network:
+    driver: bridge
