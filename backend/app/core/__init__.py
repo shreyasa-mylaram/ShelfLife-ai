@@ -1,4 +1,4 @@
- """
+"""
 SHELFLIFE AI - Core Package
 """
 

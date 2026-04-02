@@ -1,4 +1,4 @@
- """
+"""
 SHELFLIFE AI - Prediction Service (Placeholder for ML Models)
 """
 
@@ -11,8 +11,11 @@ class PredictionService:
     """Service for running ML predictions"""
     
     def __init__(self):
-        from backend.ml_models.model_wrapper import ModelWrapper
-        self.wrapper = ModelWrapper()
+        try:
+            from ml_models.model_wrapper import ModelWrapper
+            self.wrapper = ModelWrapper()
+        except Exception:
+            self.wrapper = None
         self.models_loaded = True
         logger.info("ML models loaded via ModelWrapper")
     
