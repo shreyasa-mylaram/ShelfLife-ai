@@ -5,6 +5,7 @@ SHELFLIFE AI - Alert Service
 import logging
 from datetime import datetime
 from typing import Dict, List
+import os
 from .notification_service import notification_service
 
 logging.basicConfig(level=logging.INFO)
@@ -35,10 +36,17 @@ class AlertService:
         self.alert_history.append(alert_data)
         
         if severity == self.SEVERITY_CRITICAL:
+            # Parse from .env, fallback to default mock addresses if empty
+            env_emails = os.getenv("ALERT_EMAILS", "captain@ship.com,port_control@dpworld.com")
+            env_phones = os.getenv("ALERT_PHONES", "")
+            
+            emails_list = [e.strip() for e in env_emails.split(",") if e.strip()]
+            phones_list = [p.strip() for p in env_phones.split(",") if p.strip()]
+
             recipients = {
-                'email': ['captain@ship.com', 'port_control@dpworld.com'],
-                'sms': [],  # Add phone numbers for demo
-                'whatsapp': []
+                'email': emails_list,
+                'sms': phones_list,
+                'whatsapp': phones_list
             }
             notification_service.send_critical_alert(alert_data, recipients)
         
