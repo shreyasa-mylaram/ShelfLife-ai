@@ -8,6 +8,9 @@ from app.core.config import settings
 from app.core.database import engine, Base
 from app.api import shipments, sensors, alerts
 
+# Import all models so they register with Base
+from app.models import shipment, sensor, alert
+
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
