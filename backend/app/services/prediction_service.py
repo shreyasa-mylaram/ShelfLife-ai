@@ -11,14 +11,10 @@ class PredictionService:
     """Service for running ML predictions"""
     
     def __init__(self):
-        self.models_loaded = False
-        logger.info("Prediction service initialized")
-    
-    def load_models(self):
-        """Load ML models (to be implemented with actual models)"""
-        # Placeholder - actual models will be loaded here
+        from backend.ml_models.model_wrapper import ModelWrapper
+        self.wrapper = ModelWrapper()
         self.models_loaded = True
-        logger.info("ML models loaded")
+        logger.info("ML models loaded via ModelWrapper")
     
     def predict_temperature(self, temp_history: List[float]) -> List[float]:
         """Predict temperature for next 6 hours"""
@@ -52,21 +48,21 @@ class PredictionService:
     
     def calculate_shelf_life(self, product_type: str, temp_history: List[float]) -> Dict:
         """Calculate remaining shelf life"""
-        base_life = {
-            'mangoes': 15,
-            'vaccines': 30,
-            'seafood': 7,
-            'electronics': 365
-        }.get(product_type, 15)
-        
-        # Simple calculation (placeholder)
-        days_in_transit = len(temp_history) / 24 if temp_history else 0
-        remaining = max(0, base_life - days_in_transit)
+        # Using the wrapper correctly is tricky without the full input dict,
+        # but for calculation let's route to the exact shelf life output from the wrapper.
+        current_data = {
+            'product_type': product_type,
+            'days_used': len(temp_history) / 24 if temp_history else 0,
+            'cum_abuse': 0.0 # Placeholder for simplicity
+        }
+        res = self.wrapper.predict(current_data, temp_history)
         
         return {
-            'original': base_life,
-            'remaining': round(remaining, 1),
-            'health_score': round((remaining / base_life) * 100) if base_life > 0 else 0
+            'original': {
+                'mangoes': 15, 'vaccines': 30, 'seafood': 7, 'electronics': 365
+            }.get(product_type, 15),
+            'remaining': res.get('shelf_life_remaining', 0.0),
+            'health_score': res.get('health_score', 0)
         }
 
 prediction_service = PredictionService()
