@@ -7,6 +7,7 @@ import { ContainerProvider } from './context/ContainerContext';
 import DashboardPage from './pages/DashboardPage';
 import DetailPage from './pages/DetailPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import SettingsPage from './pages/SettingsPage';
 import Header from './components/Header';
 import './index.css';
 
@@ -17,6 +18,7 @@ const Navigation = () => {
   const navItems = [
     { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/analytics', icon: BarChart3, label: 'Analytics' },
+    { path: '/settings', icon: Settings, label: 'Settings' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -93,6 +95,7 @@ function AppContent() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/container/:id" element={<DetailPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </AnimatePresence>
       </div>
