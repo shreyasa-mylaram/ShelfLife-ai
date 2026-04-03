@@ -5,6 +5,8 @@ SHELFLIFE AI - Main FastAPI Application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import socketio
+import os
+import logging
 
 from app.core.config import settings
 from app.core.database import engine, Base
@@ -14,7 +16,12 @@ from app.socket_manager import sio
 # Import all models so they register with Base
 from app.models import shipment, sensor, alert
 
-# Create database tables
+# Create database tables and ensure directories exist for production
+data_dir = os.path.join(os.getcwd(), "data")
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
+    logging.info(f"Created directory: {data_dir}")
+
 Base.metadata.create_all(bind=engine)
 
 fastapi_app = FastAPI(

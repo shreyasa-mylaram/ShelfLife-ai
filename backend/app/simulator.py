@@ -4,6 +4,7 @@ import math
 import httpx
 from datetime import datetime
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -80,9 +81,14 @@ async def run_live_simulation():
     """
     logger.info("Live Simulator Background Task Started — Sinusoidal Wave Mode")
 
-    # Wait for the app and database to fully boot up
-    await asyncio.sleep(7)
+    # Wait for the app and database to fully boot up on the platform
+    logger.info("Simulator waiting 15s for API boot...")
+    await asyncio.sleep(15)
 
+    # Detect the correct local environment
+    PORT = os.environ.get("PORT", "8000")
+    LOCAL_URL = f"http://127.0.0.1:{PORT}"
+    
     containers = list(CONTAINER_PROFILES.keys())
 
     async with httpx.AsyncClient(timeout=10.0) as client:
@@ -101,7 +107,7 @@ async def run_live_simulation():
                     }
 
                     response = await client.post(
-                        f"http://localhost:8000/api/sensors/{container}",
+                        f"{LOCAL_URL}/api/sensors/{container}",
                         json=payload
                     )
                     if response.status_code not in (200, 201):
