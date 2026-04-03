@@ -13,7 +13,7 @@ services:
         value: 3.10.0
 
   # 2. React Frontend (Static Site)
-  - type: static
+  - type: static_site
     name: shelflife-ai-frontend
     runtime: static
     rootDir: frontend
