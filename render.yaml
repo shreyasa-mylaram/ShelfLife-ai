@@ -14,11 +14,12 @@ services:
         value: 3.10.0
 
   # 2. React Frontend (Static Site)
-  - type: static
+  - type: web
     name: shelflife-ai-frontend
+    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishPath: build
+    staticPublishPath: build
     envVars:
       - key: REACT_APP_API_URL
         fromService:
