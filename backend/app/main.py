@@ -38,6 +38,14 @@ fastapi_app.include_router(shipments.router, prefix="/api/shipments", tags=["shi
 fastapi_app.include_router(sensors.router,   prefix="/api/sensors",   tags=["sensors"])
 fastapi_app.include_router(alerts.router,    prefix="/api/alerts",    tags=["alerts"])
 
+from app.simulator import run_live_simulation
+import asyncio
+
+@fastapi_app.on_event("startup")
+async def startup_event():
+    # Spawn the background simulator task to generate live oscillating temperatures
+    asyncio.create_task(run_live_simulation())
+
 @fastapi_app.get("/")
 async def root():
     return {

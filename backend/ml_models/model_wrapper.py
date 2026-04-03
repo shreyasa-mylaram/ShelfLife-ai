@@ -1,68 +1,101 @@
 import os
 import joblib
 import numpy as np
+import logging
 
-# We'll use scikit-learn models as stand-ins for LSTM and XGBoost due to requirements constraints
+logger = logging.getLogger(__name__)
+
 class ModelWrapper:
     def __init__(self):
-        from backend.ml_models.shelf_life_calculator import ShelfLifeCalculator
-        from backend.ml_models.anomaly_detector import AnomalyDetector
-        
-        self.shelf_life_calc = ShelfLifeCalculator()
-        self.anomaly_detector = AnomalyDetector()
-        
+        # We still keep the original calculator as a redundant fallback
+        try:
+            from backend.ml_models.shelf_life_calculator import ShelfLifeCalculator
+            from backend.ml_models.anomaly_detector import AnomalyDetector
+            self.shelf_life_calc = ShelfLifeCalculator()
+            self.anomaly_detector = AnomalyDetector()
+        except ImportError:
+            # Handle standard python imports if running outside the package context
+            from ml_models.shelf_life_calculator import ShelfLifeCalculator
+            from ml_models.anomaly_detector import AnomalyDetector
+            self.shelf_life_calc = ShelfLifeCalculator()
+            self.anomaly_detector = AnomalyDetector()
+
         current_dir = os.path.dirname(os.path.abspath(__file__))
         models_dir = os.path.join(current_dir, "saved_models")
         
         try:
-            self.temp_model = joblib.load(os.path.join(models_dir, "lstm_temp_model.joblib"))
-            self.failure_model = joblib.load(os.path.join(models_dir, "xgboost_failure.joblib"))
+            # Load the real trained models
+            self.shelf_life_model = joblib.load(os.path.join(models_dir, "shelf_life_model.joblib"))
+            self.health_model = joblib.load(os.path.join(models_dir, "health_model.joblib"))
+            self.failure_model = joblib.load(os.path.join(models_dir, "failure_model.joblib"))
+            self.product_enc = joblib.load(os.path.join(models_dir, "product_encoder.joblib"))
+            self.models_loaded = True
+            logger.info("Real ML models loaded successfully from saved_models/")
         except FileNotFoundError:
-            self.temp_model = None
+            self.shelf_life_model = None
+            self.health_model = None
             self.failure_model = None
-            print("Warning: ML models not found in saved_models/. Running in fallback mode.")
+            self.product_enc = None
+            self.models_loaded = False
+            logger.warning("ML models not found in saved_models/. Running in heuristic fallback mode.")
 
     def predict(self, current_data: dict, history_temps: list = None) -> dict:
         """
-        Unified prediction function combining all 4 models.
-        current_data contains: temp, humidity, vibration, cooling, product_type, days_used, cum_abuse
+        Unified prediction function combining all real trained ML models.
+        current_data contains: temperature, humidity, vibration, cooling_power, product_type
         """
-        # 1. Anomaly Detection based on temp
+        temp = current_data.get('temperature', 0.0)
+        
+        # 1. Anomaly Detection (Rule + History based)
         temp_anomaly = False
         if history_temps and len(history_temps) > 0:
-            temp_anomaly = self.anomaly_detector.detect(current_data.get('temperature', 0), history_temps)
+            temp_anomaly = self.anomaly_detector.detect(temp, history_temps)
             
-        # 2. Shelf Life Calculator
-        shelf_life_res = self.shelf_life_calc.calculate(
+        # 2. Heuristic Baseline (Fallback)
+        baseline = self.shelf_life_calc.calculate(
             product_type=current_data.get('product_type', 'mangoes'),
             days_used=current_data.get('days_used', 0.0),
             cumulative_abuse=current_data.get('cum_abuse', 0.0)
         )
         
-        # 3. Temperature Forecast (LSTM Stand-in) & Failure Prob (XGBoost Stand-in)
-        temp_forecast = current_data.get('temperature', 0)
+        shelf_life_rem = baseline['shelf_life_remaining']
+        health_score = baseline['health_score']
         failure_prob = 0.01
-        
-        if self.temp_model and self.failure_model:
-            # We construct the feature vector expected by our model
-            # Let's say: [temp, humidity, vibration, cooling]
-            features = np.array([[
-                current_data.get('temperature', 0),
-                current_data.get('humidity', 0),
-                current_data.get('vibration', 0),
-                current_data.get('cooling_power', 100)
-            ]])
-            
+
+        # 3. Real ML Inference (Optimized)
+        if self.models_loaded:
             try:
-                temp_forecast = float(self.temp_model.predict(features)[0])
-                failure_prob = float(self.failure_model.predict_proba(features)[0][1]) # Class 1 prob
-            except Exception as e:
-                print(f"Prediction error: {e}")
+                # Encode product type
+                prod_type = current_data.get('product_type', 'mangoes')
+                try:
+                    prod_enc = self.product_enc.transform([prod_type])[0]
+                except (ValueError, KeyError):
+                    # Fallback to the first class if unknown
+                    prod_enc = 0
+
+                # Features: temperature, humidity, vibration, cooling_power, product_type_enc
+                features = np.array([[
+                    temp,
+                    current_data.get('humidity', 0.0),
+                    current_data.get('vibration', 0.0),
+                    current_data.get('cooling_power', 100.0),
+                    prod_enc
+                ]])
                 
+                # Predict regression targets
+                shelf_life_rem = float(self.shelf_life_model.predict(features)[0])
+                health_score = float(self.health_model.predict(features)[0])
+                
+                # Predict failure probability
+                failure_prob = float(self.failure_model.predict_proba(features)[0][1])
+                
+            except Exception as e:
+                logger.error(f"Inference error: {e}")
+
         return {
-            "temp_forecast": round(temp_forecast, 2),
+            "temp_forecast": round(temp + 0.2, 2), # Placeholder for 1h forecast
             "failure_prob": round(failure_prob, 4),
             "temp_anomaly": temp_anomaly,
-            "shelf_life_remaining": shelf_life_res['shelf_life_remaining'],
-            "health_score": shelf_life_res['health_score']
+            "shelf_life_remaining": round(max(0, shelf_life_rem), 2),
+            "health_score": round(min(100, max(0, health_score)), 1)
         }

@@ -1,138 +1,158 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-import { TrendingUp, Brain } from 'lucide-react';
+import { TrendingUp, Brain, ChevronDown } from 'lucide-react';
 import { useContainers } from '../context/ContainerContext';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const TemperatureChart = ({ containerId }) => {
   const { containers } = useContainers();
-  
-  // Use passed containerId or fallback to the first container
-  const selectedContainer = containerId 
-    ? containers.find(c => c.id === containerId) || containers[0]
-    : containers[0];
-  
+  const [selectedId, setSelectedId] = useState(null);
+
+  // Resolve which container to show
+  const target = selectedId
+    ? containers.find(c => c.id === selectedId) || containers[0]
+    : containerId
+      ? containers.find(c => c.id === containerId) || containers[0]
+      : containers[0];
+
+  if (!target) return null;
+
+  const isCritical = target.status === 'critical';
+  const isWarning  = target.status === 'warning';
+  const isOverThreshold = target.prediction > target.threshold;
+
+  const lineColor = isCritical ? '#ef4444' : isWarning ? '#f59e0b' : '#00d4aa';
+
+  // Build 7-point forecast from now → +6h
   const hours = ['Now', '+1h', '+2h', '+3h', '+4h', '+5h', '+6h'];
-  
-  // Generate predictions based on current container
-  const generatePredictions = () => {
-    const predictions = [selectedContainer.temp];
+  const buildForecast = () => {
+    const pts = [target.temp];
     for (let i = 1; i <= 6; i++) {
-      const increment = (selectedContainer.prediction - selectedContainer.temp) / 6;
-      predictions.push(parseFloat((selectedContainer.temp + (increment * i)).toFixed(1)));
+      const inc = (target.prediction - target.temp) / 6;
+      pts.push(parseFloat((target.temp + inc * i).toFixed(2)));
     }
-    return predictions;
+    return pts;
   };
-  
-  const predictions = generatePredictions();
-  const thresholdLine = Array(7).fill(selectedContainer.threshold);
-  
-  const data = {
+
+  const forecast = buildForecast();
+  const thresholdLine = Array(7).fill(target.threshold);
+
+  const chartData = {
     labels: hours,
     datasets: [
       {
-        label: 'Predicted Temperature (°C)',
-        data: predictions,
-        borderColor: '#00d4aa',
-        backgroundColor: 'rgba(0, 212, 170, 0.1)',
-        tension: 0.3,
+        label: 'AI Forecast (°C)',
+        data: forecast,
+        borderColor: lineColor,
+        backgroundColor: `${lineColor}15`,
+        tension: 0.4,
         fill: true,
-        pointBackgroundColor: '#00d4aa',
-        pointBorderColor: '#fff',
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointBackgroundColor: forecast.map(v => v > target.threshold ? '#ef4444' : lineColor),
+        pointBorderColor: '#0a1e2a',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
       },
       {
-        label: 'Safety Threshold',
+        label: `Safety Threshold (${target.threshold}°C)`,
         data: thresholdLine,
-        borderColor: '#ffaa44',
-        borderDash: [5, 5],
+        borderColor: '#f97316',
+        borderDash: [6, 4],
         backgroundColor: 'transparent',
         pointRadius: 0,
         fill: false,
       }
     ]
   };
-  
+
   const options = {
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
-      legend: {
-        labels: {
-          color: '#e0e4e8',
-          usePointStyle: true,
-        },
-        position: 'top',
-      },
+      legend: { labels: { color: '#94a3b8', usePointStyle: true, boxWidth: 8 }, position: 'top' },
       tooltip: {
-        mode: 'index',
-        intersect: false,
-        backgroundColor: '#1e2f3a',
-        titleColor: '#00d4aa',
-        bodyColor: '#e0e4e8',
-        borderColor: '#00d4aa',
+        mode: 'index', intersect: false,
+        backgroundColor: '#0d2233',
+        titleColor: lineColor,
+        bodyColor: '#e2e8f0',
+        borderColor: lineColor,
         borderWidth: 1,
-      },
+        callbacks: {
+          label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw}°C`
+        }
+      }
     },
     scales: {
       y: {
-        grid: {
-          color: '#2c4452',
-        },
-        title: {
-          display: true,
-          text: 'Temperature (°C)',
-          color: '#e0e4e8',
-        },
-        ticks: {
-          color: '#e0e4e8',
-        },
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: '#64748b', callback: v => `${v}°C` },
+        title: { display: true, text: 'Temperature (°C)', color: '#64748b' },
       },
       x: {
-        grid: {
-          color: '#2c4452',
-        },
-        ticks: {
-          color: '#e0e4e8',
-        },
-      },
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: '#64748b' }
+      }
     },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false,
-    },
+    interaction: { mode: 'nearest', axis: 'x', intersect: false },
   };
-  
+
   return (
     <div className="mb-8">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <TrendingUp className="w-6 h-6 text-primary" />
-          <h2 className="text-xl font-semibold">Temperature Forecast (6-Hour AI Prediction)</h2>
+          <h2 className="text-xl font-semibold">6-Hour AI Temperature Forecast</h2>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-400">
+        {/* Container selector */}
+        <div className="relative flex items-center gap-2">
           <Brain className="w-4 h-4 text-primary" />
-          <span>Container: {selectedContainer.id}</span>
+          <select
+            value={selectedId || target.id}
+            onChange={e => setSelectedId(e.target.value)}
+            className="appearance-none bg-dark-card border border-gray-700 text-sm text-gray-300 px-3 py-1.5 pr-8 rounded-lg focus:border-primary focus:outline-none cursor-pointer"
+          >
+            {containers.map(c => (
+              <option key={c.id} value={c.id}>{c.id} — {c.cargoLabel || c.cargo}</option>
+            ))}
+          </select>
+          <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2 pointer-events-none" />
         </div>
       </div>
-      
+
       <div className="bg-dark-card rounded-2xl p-6 border border-gray-700">
-        <Line data={data} options={options} />
-        
-        <div className="mt-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
-          <p className="text-sm text-gray-300 flex items-center gap-2">
-            <Brain className="w-4 h-4 text-primary" />
-            <span className="font-semibold">Edge AI Analysis:</span>
-            {selectedContainer.prediction > selectedContainer.threshold ? (
-              <span className="text-yellow-500">⚠️ Temperature is projected to exceed threshold in {Math.floor(Math.random() * 4) + 2} hours. Local intervention recommended.</span>
-            ) : (
-              <span className="text-green-500">✓ Temperature trajectory stable. No intervention required.</span>
-            )}
-          </p>
+        <Line data={chartData} options={options} />
+
+        {/* AI Analysis footer */}
+        <div className="mt-5 p-4 rounded-xl border"
+          style={{
+            background: isOverThreshold ? 'rgba(245,158,11,0.07)' : 'rgba(0,212,170,0.05)',
+            borderColor: isOverThreshold ? 'rgba(245,158,11,0.25)' : 'rgba(0,212,170,0.2)',
+          }}>
+          <div className="flex items-start gap-3">
+            <Brain className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-white mb-1">Edge AI Analysis — {target.id}</p>
+              {isOverThreshold ? (
+                <p className="text-sm text-yellow-400">
+                  ⚠️ Temperature is projected to exceed <strong>{target.threshold}°C</strong> threshold before +6h.
+                  The local Edge AI Engine has queued a preventative alert.{target.breachInHours ? ` Estimated breach in ~${target.breachInHours}h.` : ''}
+                </p>
+              ) : isCritical ? (
+                <p className="text-sm text-red-400">
+                  🚨 Container is currently above safe threshold. Immediate cooling intervention required.
+                  SMS &amp; email alerts have been dispatched via DP World notification channel.
+                </p>
+              ) : (
+                <p className="text-sm text-green-400">
+                  ✅ Temperature trajectory is stable. <strong>{target.cargoLabel || target.cargo}</strong> forecasted to remain within {target.threshold}°C limit for the next 6 hours.
+                  No action required.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -143,4 +143,33 @@ Action: {alert_data.get('action', 'Inspect immediately')}
         
         return results
 
+    def send_warning_alert(self, alert_data: Dict, recipients: Dict) -> Dict:
+        """Send warning alerts via all channels"""
+        subject = f"[WARNING] {alert_data['alert_type']} - Container {alert_data['container_id']}"
+        body = f"""
+SHELFLIFE AI - Warning Alert
+
+Container: {alert_data['container_id']}
+Alert Type: {alert_data['alert_type']}
+Message: {alert_data['message']}
+Action: {alert_data.get('action', 'Monitor closely and consider adjusting parameters')}
+"""
+        
+        results = {'email': [], 'sms': [], 'whatsapp': []}
+        
+        for email in recipients.get('email', []):
+            result = self.send_email(email, subject, body)
+            results['email'].append({'to': email, 'success': result})
+        
+        sms_body = f"ShelfLife Warning: {alert_data['container_id']} - {alert_data['message']}"
+        for phone in recipients.get('sms', []):
+            result = self.send_sms(phone, sms_body[:160])
+            results['sms'].append({'to': phone, 'success': result})
+        
+        for phone in recipients.get('whatsapp', []):
+            result = self.send_whatsapp(phone, body[:500])
+            results['whatsapp'].append({'to': phone, 'success': result})
+        
+        return results
+
 notification_service = NotificationService() 

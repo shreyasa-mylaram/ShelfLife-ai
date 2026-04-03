@@ -2,9 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 @layer base {
   body {
     @apply bg-dark text-gray-200;
+    font-family: 'Inter', sans-serif;
   }
   
   ::-webkit-scrollbar {
@@ -21,16 +24,123 @@
 }
 
 @layer utilities {
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
   .animate-glow {
     animation: glow 2s ease-in-out infinite;
   }
-  
+
+  .animate-glow-red {
+    animation: glowRed 1.5s ease-in-out infinite;
+  }
+
+  .animate-scan {
+    animation: scan 3s linear infinite;
+  }
+
+  .animate-count-up {
+    animation: countUp 1s ease-out forwards;
+  }
+
+  .glass {
+    background: rgba(14, 30, 42, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #00d4aa, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-warn {
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0, 212, 170, 0.15);
+  }
+
+  /* Health score ring */
+  .health-ring {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+  .health-ring-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.08);
+    stroke-width: 4;
+  }
+  .health-ring-fill {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease-out;
+  }
+
+  /* Critical pulse */
+  .pulse-critical {
+    animation: pulseCritical 1.2s ease-in-out infinite;
+  }
+
   @keyframes glow {
-    0%, 100% {
-      box-shadow: 0 0 5px rgba(0, 212, 170, 0.3);
+    0%, 100% { box-shadow: 0 0 5px rgba(0, 212, 170, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(0, 212, 170, 0.7); }
+  }
+
+  @keyframes glowRed {
+    0%, 100% { 
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 5px rgba(239, 68, 68, 0.2);
     }
-    50% {
-      box-shadow: 0 0 20px rgba(0, 212, 170, 0.6);
+    50% { 
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.8), 0 0 50px rgba(239, 68, 68, 0.3), inset 0 0 15px rgba(239, 68, 68, 0.4);
     }
   }
-}
+
+  @keyframes pulseCritical {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  @keyframes scan {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 0% 200%; }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, transparent 25%, rgba(0,212,170,0.08) 50%, transparent 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Scanline overlay for offline mode */
+  .scanlines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 212, 170, 0.015) 2px,
+      rgba(0, 212, 170, 0.015) 4px
+    );
+    pointer-events: none;
+  }
+}

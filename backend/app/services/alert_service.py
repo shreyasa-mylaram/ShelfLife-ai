@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class AlertService:
     SEVERITY_CRITICAL = "CRITICAL"
+    SEVERITY_PREDICTIVE_CRITICAL = "PREDICTIVE_CRITICAL"
     SEVERITY_HIGH = "HIGH"
     SEVERITY_WARNING = "WARNING"
     SEVERITY_INFO = "INFO"
@@ -37,6 +38,34 @@ class AlertService:
         
         if severity == self.SEVERITY_CRITICAL:
             # Parse from .env, fallback to default mock addresses if empty
+            env_emails = os.getenv("ALERT_EMAILS", "captain@ship.com,port_control@dpworld.com")
+            env_phones = os.getenv("ALERT_PHONES", "")
+            
+            emails_list = [e.strip() for e in env_emails.split(",") if e.strip()]
+            phones_list = [p.strip() for p in env_phones.split(",") if p.strip()]
+
+            recipients = {
+                'email': emails_list,
+                'sms': phones_list,
+                'whatsapp': phones_list
+            }
+            notification_service.send_critical_alert(alert_data, recipients)
+            
+        elif severity == self.SEVERITY_WARNING:
+            env_emails = os.getenv("ALERT_EMAILS_WARNING", os.getenv("ALERT_EMAILS", "captain@ship.com"))
+            env_phones = os.getenv("ALERT_PHONES_WARNING", os.getenv("ALERT_PHONES", ""))
+            
+            emails_list = [e.strip() for e in env_emails.split(",") if e.strip()]
+            phones_list = [p.strip() for p in env_phones.split(",") if p.strip()]
+
+            recipients = {
+                'email': emails_list,
+                'sms': phones_list,
+                'whatsapp': phones_list
+            }
+            notification_service.send_warning_alert(alert_data, recipients)
+            
+        elif severity == self.SEVERITY_PREDICTIVE_CRITICAL:
             env_emails = os.getenv("ALERT_EMAILS", "captain@ship.com,port_control@dpworld.com")
             env_phones = os.getenv("ALERT_PHONES", "")
             

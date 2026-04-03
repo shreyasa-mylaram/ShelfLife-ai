@@ -73,9 +73,10 @@ export const useShipmentData = (containerId = null) => {
 
         setData({
           id: shipment.container_id,
-          cargo: shipment.product_type?.replace('_', ' ')
-            .replace(/\b\w/g, c => c.toUpperCase()),
-          product_type: shipment.product_type,
+          cargo: shipment.product_type 
+            ? shipment.product_type.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())
+            : 'Unknown Cargo',
+          product_type: shipment.product_type || 'Unknown Cargo',
           temp: parseFloat((latest.temperature ?? 3.5).toFixed(2)),
           humidity: parseFloat((latest.humidity ?? 55).toFixed(1)),
           battery: parseFloat((latest.cooling_power ?? 85).toFixed(1)),

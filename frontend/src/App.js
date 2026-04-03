@@ -11,93 +11,48 @@ import SettingsPage from './pages/SettingsPage';
 import Header from './components/Header';
 import './index.css';
 
-const Navigation = () => {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const location = useLocation();
-
-  const navItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/analytics', icon: BarChart3, label: 'Analytics' },
-    { path: '/settings', icon: Settings, label: 'Settings' },
-  ];
-
-  const isActive = (path) => location.pathname === path;
-
-  return (
-    <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-dark-card rounded-lg border border-gray-700"
-      >
-        {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
-
-      {/* Sidebar Navigation */}
-      <nav className={`
-        fixed left-0 top-0 h-full w-64 bg-dark-card border-r border-gray-700 z-40
-        transform transition-transform duration-300 ease-in-out
-        lg:translate-x-0 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-8">
-            <Package className="w-8 h-8 text-primary" />
-            <div>
-              <h1 className="text-lg font-bold text-primary">Shelf Life AI</h1>
-              <p className="text-xs text-gray-500">Freshness Guaranteed</p>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`
-                    flex items-center gap-3 px-4 py-3 rounded-lg transition-all
-                    ${isActive(item.path) 
-                      ? 'bg-primary/20 text-primary border border-primary/50' 
-                      : 'text-gray-400 hover:bg-dark-lighter hover:text-white'
-                    }
-                  `}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                  {isActive(item.path) && (
-                    <motion.div
-                      layoutId="active-nav"
-                      className="ml-auto w-1 h-6 bg-primary rounded-full"
-                    />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </nav>
-    </>
-  );
-};
+import Sidebar from './components/Sidebar';
 
 function AppContent() {
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark to-dark/90">
-      <Navigation />
-      <div className="lg:ml-64">
-        <Header />
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/container/:id" element={<DetailPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-          </Routes>
-        </AnimatePresence>
+    <div className="min-h-screen bg-gradient-to-br from-dark to-dark/90 flex overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar - Desktop and Mobile */}
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 w-64 z-50 transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <Sidebar onClose={() => setIsSidebarOpen(false)} />
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative">
+        <Header onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1">
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/container/:id" element={<DetailPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Routes>
+          </AnimatePresence>
+        </main>
       </div>
     </div>
   );
