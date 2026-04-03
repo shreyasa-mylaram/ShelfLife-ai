@@ -1,0 +1,27 @@
+services:
+  # 1. FastAPI Backend (Web Service)
+  - type: web
+    name: shelflife-ai-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./data/shelflife.db
+      - key: PYTHON_VERSION
+        value: 3.10.0
+
+  # 2. React Frontend (Static Site)
+  - type: static
+    name: shelflife-ai-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          name: shelflife-ai-backend
+          type: web
+          property: host

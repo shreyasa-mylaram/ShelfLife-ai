@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 import {
   ArrowLeft, Thermometer, Droplets, Battery, MapPin,
   Package, AlertTriangle, Brain, Download, RefreshCw,
-  Activity, Shield, Clock, TrendingUp, Ship, Zap
+  Activity, Shield, Clock, TrendingUp, Ship, Zap, Radio
 } from 'lucide-react';
 import { CHART_COLORS } from '../utils/constants';
 import ContainerTwin from '../components/ContainerTwin';
@@ -49,7 +49,16 @@ const StatCard = ({ icon: Icon, iconColor, label, value, sub, trend }) => (
       )}
     </div>
     <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">{label}</p>
-    <p className="text-3xl font-bold text-white leading-none">{value}</p>
+    <div className="flex items-baseline gap-2">
+      <motion.p 
+        key={value}
+        initial={{ filter: 'brightness(1.5)', scale: 1.05 }}
+        animate={{ filter: 'brightness(1)', scale: 1 }}
+        className="text-3xl font-bold text-white leading-none"
+      >
+        {value}
+      </motion.p>
+    </div>
     {sub && <p className="text-[10px] text-gray-500 mt-2 font-medium">{sub}</p>}
   </motion.div>
 );
@@ -177,6 +186,9 @@ const DetailPage = () => {
                    <Package className="w-6 h-6 text-primary" />
                    <h1 className="text-4xl font-black text-white font-mono tracking-tighter">{container.id}</h1>
                    <StatusBadge status={container.status} />
+                   <div className="flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 border border-primary/30 rounded text-[10px] font-black text-primary animate-pulse">
+                      <Radio className="w-3 h-3" /> LIVE STREAM
+                   </div>
                 </div>
                 <div className="flex items-center gap-4 mt-2 text-xs text-gray-400 font-medium">
                    <div className="flex items-center gap-1.5 truncate max-w-[200px]"><Ship className="w-3.5 h-3.5" />{container.location}</div>

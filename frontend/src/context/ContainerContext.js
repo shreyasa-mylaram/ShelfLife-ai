@@ -87,7 +87,8 @@ export const ContainerProvider = ({ children }) => {
 
   useEffect(() => {
     // 1. Establish Secure Handshake to Edge Hub
-    socketRef.current = io('http://localhost:8000', {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+    socketRef.current = io(API_URL, {
        transports: ['websocket'],
        autoConnect: true,
        reconnection: true
