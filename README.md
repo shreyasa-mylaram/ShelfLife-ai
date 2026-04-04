@@ -57,9 +57,9 @@ docker-compose up --build
 ```
 
 ### Access Points
-*   **Dashboard:** [http://localhost:3000](http://localhost:3000)
-*   **API Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
-*   **InfluxDB Console:** [http://localhost:8086](http://localhost:8086)
+*   **Dashboard:**  https://shelflife-ai-frontend.onrender.com
+*   **API Documentation:**  https://shelflife-ai-backend.onrender.com/docs
+*   **InfluxDB Console:**  https://shelflife-ai-backend.onrender.com
 
 ---
 
