@@ -23,7 +23,7 @@ const TemperatureChart = ({ containerId }) => {
   const isWarning  = target.status === 'warning';
   const isOverThreshold = target.prediction > target.threshold;
 
-  const lineColor = isCritical ? '#ef4444' : isWarning ? '#f59e0b' : '#00d4aa';
+  const lineColor = isCritical ? '#e11d48' : isWarning ? '#d97706' : '#0d9488';
 
   // Build 7-point forecast from now → +6h
   const hours = ['Now', '+1h', '+2h', '+3h', '+4h', '+5h', '+6h'];
@@ -49,8 +49,8 @@ const TemperatureChart = ({ containerId }) => {
         backgroundColor: `${lineColor}15`,
         tension: 0.4,
         fill: true,
-        pointBackgroundColor: forecast.map(v => v > target.threshold ? '#ef4444' : lineColor),
-        pointBorderColor: '#0a1e2a',
+        pointBackgroundColor: forecast.map(v => v > target.threshold ? '#e11d48' : lineColor),
+        pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
         pointRadius: 5,
         pointHoverRadius: 7,
@@ -71,14 +71,16 @@ const TemperatureChart = ({ containerId }) => {
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
-      legend: { labels: { color: '#94a3b8', usePointStyle: true, boxWidth: 8 }, position: 'top' },
+      legend: { labels: { color: '#475569', usePointStyle: true, boxWidth: 8, font: { weight: '600' } }, position: 'top' },
       tooltip: {
         mode: 'index', intersect: false,
-        backgroundColor: '#0d2233',
-        titleColor: lineColor,
-        bodyColor: '#e2e8f0',
-        borderColor: lineColor,
+        backgroundColor: '#ffffff',
+        titleColor: '#0f172a',
+        bodyColor: '#334155',
+        borderColor: '#e2e8f0',
         borderWidth: 1,
+        padding: 10,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         callbacks: {
           label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw}°C`
         }
@@ -86,12 +88,12 @@ const TemperatureChart = ({ containerId }) => {
     },
     scales: {
       y: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
+        grid: { color: 'rgba(0,0,0,0.05)' },
         ticks: { color: '#64748b', callback: v => `${v}°C` },
         title: { display: true, text: 'Temperature (°C)', color: '#64748b' },
       },
       x: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
+        grid: { color: 'rgba(0,0,0,0.04)' },
         ticks: { color: '#64748b' }
       }
     },
@@ -103,50 +105,52 @@ const TemperatureChart = ({ containerId }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <TrendingUp className="w-6 h-6 text-primary" />
-          <h2 className="text-xl font-semibold">6-Hour AI Temperature Forecast</h2>
+          <TrendingUp className="w-6 h-6 text-teal-600" />
+          <h2 className="text-xl font-bold text-slate-900">6-Hour AI Temperature Forecast</h2>
         </div>
         {/* Container selector */}
         <div className="relative flex items-center gap-2">
-          <Brain className="w-4 h-4 text-primary" />
+          <Brain className="w-4 h-4 text-teal-600" />
           <select
             value={selectedId || target.id}
             onChange={e => setSelectedId(e.target.value)}
-            className="appearance-none bg-dark-card border border-gray-700 text-sm text-gray-300 px-3 py-1.5 pr-8 rounded-lg focus:border-primary focus:outline-none cursor-pointer"
+            className="appearance-none bg-white border border-slate-200 text-sm font-semibold text-slate-700 px-3 py-1.5 pr-8 rounded-xl focus:border-teal-600 focus:outline-none cursor-pointer shadow-2xs"
           >
             {containers.map(c => (
               <option key={c.id} value={c.id}>{c.id} — {c.cargoLabel || c.cargo}</option>
             ))}
           </select>
-          <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2 pointer-events-none" />
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 pointer-events-none" />
         </div>
       </div>
 
-      <div className="bg-dark-card rounded-2xl p-6 border border-gray-700">
+      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
         <Line data={chartData} options={options} />
 
         {/* AI Analysis footer */}
-        <div className="mt-5 p-4 rounded-xl border"
-          style={{
-            background: isOverThreshold ? 'rgba(245,158,11,0.07)' : 'rgba(0,212,170,0.05)',
-            borderColor: isOverThreshold ? 'rgba(245,158,11,0.25)' : 'rgba(0,212,170,0.2)',
-          }}>
+        <div className={`mt-5 p-4 rounded-2xl border ${
+          isOverThreshold ? 'bg-amber-50 border-amber-200 text-amber-900' :
+          isCritical ? 'bg-rose-50 border-rose-200 text-rose-900' :
+          'bg-teal-50/70 border-teal-200 text-teal-900'
+        }`}>
           <div className="flex items-start gap-3">
-            <Brain className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+            <Brain className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+              isOverThreshold ? 'text-amber-600' : isCritical ? 'text-rose-600' : 'text-teal-700'
+            }`} />
             <div>
-              <p className="text-sm font-semibold text-white mb-1">Edge AI Analysis — {target.id}</p>
+              <p className="text-sm font-bold mb-1">Edge AI Analysis — {target.id}</p>
               {isOverThreshold ? (
-                <p className="text-sm text-yellow-400">
+                <p className="text-sm text-amber-800">
                   ⚠️ Temperature is projected to exceed <strong>{target.threshold}°C</strong> threshold before +6h.
                   The local Edge AI Engine has queued a preventative alert.{target.breachInHours ? ` Estimated breach in ~${target.breachInHours}h.` : ''}
                 </p>
               ) : isCritical ? (
-                <p className="text-sm text-red-400">
+                <p className="text-sm text-rose-800">
                   🚨 Container is currently above safe threshold. Immediate cooling intervention required.
                   SMS &amp; email alerts have been dispatched via DP World notification channel.
                 </p>
               ) : (
-                <p className="text-sm text-green-400">
+                <p className="text-sm text-emerald-800">
                   ✅ Temperature trajectory is stable. <strong>{target.cargoLabel || target.cargo}</strong> forecasted to remain within {target.threshold}°C limit for the next 6 hours.
                   No action required.
                 </p>

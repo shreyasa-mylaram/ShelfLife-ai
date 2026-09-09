@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL } from '../utils/constants';
 
-const API = 'http://localhost:8000/api';
+const API = API_BASE_URL;
 
 // Helper: compute status from temperature
 const getStatus = (temp) => {

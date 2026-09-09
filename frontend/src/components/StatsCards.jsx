@@ -1,13 +1,12 @@
 import React from 'react';
 import { useContainers } from '../context/ContainerContext';
-import { Ship, AlertTriangle, CloudOff, Leaf, Brain } from 'lucide-react';
+import { Ship, AlertTriangle, Leaf } from 'lucide-react';
 
 const StatsCards = ({ activeFilter, onFilterChange = () => {} }) => {
-  const { containers, pendingSyncCount } = useContainers();
+  const { containers } = useContainers();
 
   const activeContainers = containers.length;
   const alertCount = containers.filter(c => c.status !== 'normal').length;
-  const predictiveCount = containers.filter(c => c.breachInHours !== null).length;
   const normalCount = containers.filter(c => c.status === 'normal').length;
 
   const cards = [
@@ -17,8 +16,10 @@ const StatsCards = ({ activeFilter, onFilterChange = () => {} }) => {
       value: activeContainers,
       sub: 'Currently in transit',
       icon: Ship,
-      color: '#00d4aa', // Custom Teal
-      glow: 'rgba(0,212,170,0.15)',
+      color: '#0d9488', // Teal
+      pastelBg: '#f0fdfa',
+      pastelBorder: '#99f6e4',
+      glow: 'rgba(13,148,136,0.15)',
     },
     {
       id: 'alerts',
@@ -26,18 +27,22 @@ const StatsCards = ({ activeFilter, onFilterChange = () => {} }) => {
       value: alertCount,
       sub: '6-hour AI forecast issues',
       icon: AlertTriangle,
-      color: '#f59e0b', // Amber
-      glow: 'rgba(245,158,11,0.15)',
+      color: '#d97706', // Amber
+      pastelBg: '#fffbeb',
+      pastelBorder: '#fde68a',
+      glow: 'rgba(217,119,6,0.15)',
       pulse: alertCount > 0,
     },
     {
       id: 'sync',
-      title: 'Pending Sync',
-      value: pendingSyncCount,
-      sub: 'Data awaiting cloud upload',
-      icon: CloudOff,
-      color: '#8b5cf6', // Vivid Purple
-      glow: 'rgba(139,92,246,0.15)',
+      title: 'Ship Network Sync',
+      value: `${activeContainers}/${activeContainers}`,
+      sub: 'All telemetry live over Vessel LAN',
+      icon: Ship,
+      color: '#0284c7', // Sky blue
+      pastelBg: '#f0f9ff',
+      pastelBorder: '#bae6fd',
+      glow: 'rgba(2,132,199,0.15)',
     },
     {
       id: 'waste',
@@ -45,8 +50,10 @@ const StatsCards = ({ activeFilter, onFilterChange = () => {} }) => {
       value: `${normalCount}/${activeContainers}`,
       sub: '15-20% insurance claim reduction',
       icon: Leaf,
-      color: '#10b981', // Emerald
-      glow: 'rgba(16,185,129,0.15)',
+      color: '#059669', // Emerald
+      pastelBg: '#ecfdf5',
+      pastelBorder: '#a7f3d0',
+      glow: 'rgba(5,150,105,0.15)',
     },
   ];
 
@@ -59,34 +66,29 @@ const StatsCards = ({ activeFilter, onFilterChange = () => {} }) => {
           <div
             key={card.id}
             onClick={() => onFilterChange(card.id)}
-            className="relative rounded-2xl p-5 cursor-pointer transition-all duration-200 overflow-hidden"
+            className="relative rounded-3xl p-5 cursor-pointer transition-all duration-200 overflow-hidden shadow-xs hover:shadow-md"
             style={{
-              background: isActive
-                ? `linear-gradient(135deg, ${card.glow}, rgba(10,30,42,0.95))`
-                : 'rgba(10,30,42,0.7)',
-              border: `1px solid ${isActive ? card.color : 'rgba(255,255,255,0.07)'}`,
-              boxShadow: isActive ? `0 0 20px ${card.glow}` : 'none',
+              background: isActive ? card.pastelBg : '#ffffff',
+              border: `1px solid ${isActive ? card.color : '#e2e8f0'}`,
+              boxShadow: isActive ? `0 10px 25px -5px ${card.glow}` : '0 2px 8px -2px rgba(100,116,139,0.06)',
             }}
           >
-            {/* Background shimmer when active */}
-            {isActive && <div className="absolute inset-0 shimmer pointer-events-none" />}
-
             <div className="relative flex justify-between items-start mb-3">
-              <p className="text-gray-400 text-xs uppercase tracking-widest">{card.title}</p>
-              <div className="p-1.5 rounded-lg" style={{ background: `${card.color}18` }}>
+              <p className="text-slate-500 text-xs uppercase tracking-widest font-semibold">{card.title}</p>
+              <div className="p-2 rounded-xl" style={{ background: card.pastelBg, border: `1px solid ${card.pastelBorder}` }}>
                 <Icon className="w-4 h-4" style={{ color: card.color }} />
               </div>
             </div>
-            <p className="text-3xl font-bold relative" style={{ color: isActive ? card.color : '#ffffff' }}>
+            <p className="text-3xl font-black relative" style={{ color: isActive ? card.color : '#0f172a' }}>
               {card.value}
               {card.pulse && card.value > 0 && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
               )}
             </p>
-            <p className="text-gray-500 text-xs mt-1.5">{card.sub}</p>
+            <p className="text-slate-500 text-xs mt-1.5 font-medium">{card.sub}</p>
 
             {isActive && (
-              <div className="mt-2 h-0.5 rounded-full w-1/3" style={{ background: card.color }} />
+              <div className="mt-3 h-1 rounded-full w-1/3" style={{ background: card.color }} />
             )}
           </div>
         );

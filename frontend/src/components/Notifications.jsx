@@ -12,17 +12,17 @@ const Notifications = () => {
       {notifications.map((note) => (
         <div 
           key={note.id} 
-          className={`flex items-start justify-between p-4 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] border ${
-            note.type === 'error' ? 'bg-red-900/40 border-red-500 text-red-50' :
-            note.type === 'success' ? 'bg-green-900/40 border-green-500 text-green-50' :
-            note.type === 'warning' ? 'bg-yellow-900/40 border-yellow-500 text-yellow-50' :
-            'bg-dark-card border-primary text-gray-200'
+          className={`flex items-start justify-between p-4 rounded-xl shadow-lg border ${
+            note.type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-800' :
+            note.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' :
+            note.type === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-800' :
+            'bg-white border-teal-200 text-slate-800'
           } backdrop-blur-md transition-all duration-300 transform translate-x-0`}
         >
-          <div className="flex-1 mr-3 text-sm whitespace-pre-wrap">{note.message}</div>
+          <div className="flex-1 mr-3 text-sm font-medium whitespace-pre-wrap">{note.message}</div>
           <button 
             onClick={() => removeNotification(note.id)}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-slate-400 hover:text-slate-700 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

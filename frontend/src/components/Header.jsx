@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useContainers } from '../context/ContainerContext';
-import { Wifi, UploadCloud, Zap, CloudOff, RefreshCw, ShieldCheck, Menu, ChevronRight } from 'lucide-react';
+import { Wifi, UploadCloud, Zap, RefreshCw, ShieldCheck, Menu, ChevronRight, Ship } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Header = ({ onMenuClick }) => {
@@ -37,17 +37,17 @@ const Header = ({ onMenuClick }) => {
 
   // Determine page title and accent color based on route
   const getPageContext = () => {
-    if (location.pathname === '/') return { title: 'Fleet Operations', color: 'text-primary' };
-    if (location.pathname === '/analytics') return { title: 'Intelligence Center', color: 'text-blue-400' };
-    if (location.pathname === '/settings') return { title: 'Edge Config', color: 'text-gray-400' };
-    if (location.pathname.includes('/container/')) return { title: 'Node Detail', color: 'text-primary' };
-    return { title: 'ShelfLife AI', color: 'text-primary' };
+    if (location.pathname === '/') return { title: 'Fleet Operations', color: 'text-teal-700' };
+    if (location.pathname === '/analytics') return { title: 'Intelligence Center', color: 'text-sky-700' };
+    if (location.pathname === '/settings') return { title: 'Edge Config', color: 'text-slate-700' };
+    if (location.pathname.includes('/container/')) return { title: 'Node Detail', color: 'text-teal-700' };
+    return { title: 'ShelfLife AI', color: 'text-teal-700' };
   };
 
   const context = getPageContext();
 
   return (
-    <header className="bg-dark/40 backdrop-blur-md border-b border-white/5 sticky top-0 z-30 py-3">
+    <header className="bg-white/85 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 py-3 shadow-xs">
       {/* Neural Sync Scanline */}
       <AnimatePresence>
         {isScanning && (
@@ -55,7 +55,7 @@ const Header = ({ onMenuClick }) => {
             initial={{ left: '-100%' }}
             animate={{ left: '100%' }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="absolute top-0 h-[2px] w-[30%] bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_8px_rgba(59,130,246,0.8)] z-50"
+            className="absolute top-0 h-[2px] w-[30%] bg-gradient-to-r from-transparent via-teal-400 to-transparent z-50"
           />
         )}
       </AnimatePresence>
@@ -67,26 +67,26 @@ const Header = ({ onMenuClick }) => {
              {/* Mobile Menu Icon */}
              <button 
                 onClick={onMenuClick}
-                className="lg:hidden p-2 text-gray-400 hover:text-white transition-colors"
+                className="lg:hidden p-2 text-slate-500 hover:text-slate-800 transition-colors"
              >
                 <Menu className="w-6 h-6" />
              </button>
 
              <div className="hidden lg:block">
                 <div className="flex items-center gap-2 mb-0.5">
-                   <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">DP World</span>
-                   <ChevronRight className="w-3 h-3 text-gray-700" />
+                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">DP World</span>
+                   <ChevronRight className="w-3 h-3 text-slate-400" />
                    <h2 className={`text-sm font-black uppercase tracking-widest ${context.color}`}>{context.title}</h2>
                 </div>
                  <div className="flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-primary animate-pulse' : 'bg-yellow-500'}`} />
-                    <span className="text-[10px] text-gray-500 font-bold uppercase">{isOnline ? 'System Live' : 'Edge Mode Active'}</span>
-                    <span className="text-[8px] text-primary/50 font-black ml-1 tracking-[0.2em]">UPTIME: {formatUptime(uptime)}</span>
+                    <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-teal-500 animate-pulse' : 'bg-sky-500'}`} />
+                    <span className="text-[10px] text-slate-500 font-bold uppercase">{isOnline ? 'Ship LAN + SatLink' : 'Vessel Local Network (LAN)'}</span>
+                    <span className="text-[8px] text-teal-600/70 font-black ml-1 tracking-[0.2em]">UPTIME: {formatUptime(uptime)}</span>
                  </div>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full">
-                 <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                 <span className="text-[9px] font-black text-red-500 uppercase tracking-widest">LIVE</span>
+              <div className="flex items-center gap-2 px-3 py-1 bg-rose-50 border border-rose-200 rounded-full">
+                 <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                 <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">LIVE</span>
               </div>
            </div>
           
@@ -99,38 +99,38 @@ const Header = ({ onMenuClick }) => {
               onClick={toggleConnectivity}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                 isOnline 
-                ? 'bg-blue-600/10 border-blue-600/20 text-blue-400' 
-                : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
+                ? 'bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100/70' 
+                : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200/70'
               }`}
             >
-              {isOnline ? <Wifi className="w-4 h-4" /> : <CloudOff className="w-4 h-4" />}
-              <span className="hidden md:inline">{isOnline ? 'Cloud Linked' : 'Offline Engine'}</span>
+              {isOnline ? <Wifi className="w-4 h-4" /> : <Ship className="w-4 h-4 text-teal-600" />}
+              <span className="hidden md:inline">{isOnline ? 'Satellite Linked' : 'Ship Local Network'}</span>
             </motion.button>
 
              {/* Sync Status */}
-             <div className="hidden sm:flex items-center gap-4 px-4 py-2 bg-white/3 border border-white/10 rounded-xl">
+             <div className="hidden sm:flex items-center gap-4 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl">
                 <div className="flex items-center gap-2">
-                   <UploadCloud className="w-4 h-4 text-blue-400" />
-                   <span className="text-[10px] font-bold text-gray-400 uppercase">Last Sync: {lastSyncTime}</span>
+                   <UploadCloud className="w-4 h-4 text-sky-600" />
+                   <span className="text-[10px] font-bold text-slate-600 uppercase">Last Sync: {lastSyncTime}</span>
                 </div>
                 {pendingSyncCount > 0 && (
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-orange-600 text-white rounded-md text-[10px] font-black animate-pulse shadow-[0_0_10px_rgba(234,88,12,0.4)]">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-500 text-white rounded-md text-[10px] font-black animate-pulse shadow-sm">
                      <Zap className="w-3 h-3" /> {pendingSyncCount} PENDING
                   </div>
                 )}
              </div>
 
             {/* Sustainability Impact */}
-            <div className="hidden xl:flex items-center gap-2 px-3 py-2 bg-emerald-500/5 border border-emerald-500/10 rounded-xl hover:bg-emerald-500/10 transition-colors">
-               <div className="p-1 px-2 bg-emerald-500/20 rounded flex items-center gap-1.5">
-                  <span className="text-[8px] font-black text-emerald-400 uppercase tracking-tighter italic">Impact</span>
-                  <span className="text-[10px] font-mono font-bold text-emerald-300">-{co2Saved.toFixed(2)} kg CO₂</span>
+            <div className="hidden xl:flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl transition-colors">
+               <div className="p-1 px-2 bg-emerald-100/70 rounded flex items-center gap-1.5">
+                  <span className="text-[8px] font-black text-emerald-700 uppercase tracking-tighter italic">Impact</span>
+                  <span className="text-[10px] font-mono font-bold text-emerald-800">-{co2Saved.toFixed(2)} kg CO₂</span>
                </div>
             </div>
 
             {/* Security Guard */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-2 text-gray-500 hover:text-white transition-colors group">
-               <ShieldCheck className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
+            <div className="hidden lg:flex items-center gap-2 px-3 py-2 text-slate-500 hover:text-slate-800 transition-colors group">
+               <ShieldCheck className="w-4 h-4 text-sky-600 group-hover:scale-110 transition-transform" />
                <span className="text-[10px] font-bold uppercase tracking-tighter">Secure Engine v2</span>
             </div>
 
@@ -139,7 +139,7 @@ const Header = ({ onMenuClick }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={forceSync}
-              className="p-2.5 bg-primary text-dark rounded-xl shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all ml-2"
+              className="p-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm transition-all ml-2"
             >
               <RefreshCw className="w-4 h-4 font-bold" />
             </motion.button>

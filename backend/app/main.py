@@ -10,7 +10,7 @@ import logging
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import shipments, sensors, alerts, predictions
+from app.api import shipments, sensors, alerts, predictions, reroute
 from app.socket_manager import sio
 
 # Import all models so they register with Base
@@ -45,6 +45,7 @@ fastapi_app.include_router(shipments.router,   prefix="/api/shipments",   tags=[
 fastapi_app.include_router(sensors.router,     prefix="/api/sensors",     tags=["sensors"])
 fastapi_app.include_router(alerts.router,      prefix="/api/alerts",      tags=["alerts"])
 fastapi_app.include_router(predictions.router, prefix="/api/predictions", tags=["predictions"])
+fastapi_app.include_router(reroute.router,     prefix="/api/reroute",     tags=["reroute"])
 
 from app.simulator import run_live_simulation
 import asyncio

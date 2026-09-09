@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useContainers } from '../context/ContainerContext';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement, Filler
 } from 'chart.js';
-import { TrendingUp, TrendingDown, AlertTriangle, DollarSign, Package, Download, Calendar, Brain, Shield, Clock } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Package, Download, Brain, Shield, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { formatNumber } from '../utils/formatters';
-import { CHART_COLORS } from '../utils/constants';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement, Filler);
 
@@ -17,39 +15,25 @@ const AnalyticsPage = () => {
   const [period, setPeriod] = useState('week');
   const [isExporting, setIsExporting] = useState(false);
 
-  const [analyticsData, setAnalyticsData] = useState({
-    totalContainers: 0,
-    alertsCount: 0,
-    avgTemperature: 0,
-    wasteReduction: 18.2,
-    savings: 3450000
-  });
-
-  useEffect(() => {
-    const total = containers.length;
-    const alerts = containers.filter(c => c.status !== 'normal').length;
-    const avgTemp = containers.reduce((sum, c) => sum + c.temp, 0) / (total || 1);
-    
-    setAnalyticsData(prev => ({
-      ...prev,
-      totalContainers: total,
-      alertsCount: alerts,
-      avgTemperature: avgTemp,
-      primaryColor: '#3b82f6' // Royal Blue theme for Intelligence
-    }));
-  }, [containers]);
-
-  // Chart options themed for glassmorphism
+  // Chart options themed for light pastel design
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }, position: 'bottom' },
-      tooltip: { backgroundColor: '#0d2233', titleColor: '#00d4aa', borderColor: 'rgba(255,255,255,0.05)', borderWidth: 1 }
+      legend: { labels: { color: '#475569', font: { family: 'Inter', size: 11, weight: '600' } }, position: 'bottom' },
+      tooltip: { 
+        backgroundColor: '#ffffff', 
+        titleColor: '#0f172a', 
+        bodyColor: '#334155',
+        borderColor: '#e2e8f0', 
+        borderWidth: 1,
+        padding: 10,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+      }
     },
     scales: {
-      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b' } },
-      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b' } }
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#64748b' } },
+      x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#64748b' } }
     }
   };
 
@@ -76,23 +60,23 @@ const AnalyticsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark to-dark/95 py-8">
+    <div className="min-h-screen bg-[#f8f9fc] text-slate-800 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Hero */}
-        <div className="flex flex-wrap justify-between items-center gap-6 mb-10 pb-8 border-b border-white/5">
+        <div className="flex flex-wrap justify-between items-center gap-6 mb-8 pb-6 border-b border-slate-200">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Predictive Intelligence Analytics</h1>
-            <p className="text-gray-400 mt-2 max-w-2xl text-sm leading-relaxed">
-              Global intelligence insights for DP World fleet. ShelfLife AI saves an average of <span className="text-blue-400 font-bold">$280k per shipment</span> through early predictive intervention.
+            <h1 className="text-3xl font-black tracking-tight text-slate-900">Predictive Intelligence Analytics</h1>
+            <p className="text-slate-500 mt-2 max-w-2xl text-sm leading-relaxed font-medium">
+              Global intelligence insights for DP World fleet. ShelfLife AI saves an average of <span className="text-teal-700 font-bold">$280k per shipment</span> through early predictive intervention.
             </p>
           </div>
-          <div className="flex gap-4">
-            <div className="bg-dark-card border border-white/5 p-1 rounded-xl flex items-center">
+          <div className="flex gap-3">
+            <div className="bg-white border border-slate-200 p-1 rounded-2xl flex items-center shadow-2xs">
               {['day', 'week', 'month'].map(p => (
                 <button
                   key={p} onClick={() => setPeriod(p)}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${period === p ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
+                  className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${period === p ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
                 >
                   {p.toUpperCase()}
                 </button>
@@ -101,76 +85,77 @@ const AnalyticsPage = () => {
             <motion.button
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
               onClick={handleExport} disabled={isExporting}
-              className="px-6 py-2 bg-blue-600/15 border border-blue-600/40 text-blue-400 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
+              className="px-5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-2xl text-xs font-bold shadow-2xs transition-all flex items-center gap-2"
             >
-              <Download className="w-4 h-4" /> Export Intelligence Report
+              <Download className="w-4 h-4 text-teal-600" /> Export Intelligence Report
             </motion.button>
           </div>
         </div>
 
         {/* Dynamic AI Savings Card */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-           <div className="lg:col-span-2 bg-dark-card rounded-3xl p-6 border border-primary/20 relative overflow-hidden group">
+           <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Brain className="w-48 h-48 text-primary" />
+              <Brain className="w-48 h-48 text-teal-600" />
             </div>
             <div className="relative">
-              <span className="px-3 py-1 bg-primary/10 text-primary border border-primary/30 rounded-full text-[10px] font-bold uppercase tracking-widest">Global Impact</span>
-              <h2 className="text-4xl font-black text-white mt-4">$3,450,000</h2>
-              <p className="text-gray-400 text-sm mt-1 mb-6 italic">Estimated annual savings via predictive monitoring</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <span className="px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-[10px] font-bold uppercase tracking-widest">Global Impact</span>
+              <h2 className="text-4xl font-black text-slate-900 mt-4">$3,450,000</h2>
+              <p className="text-slate-500 text-sm mt-1 mb-6 font-medium">Estimated annual savings via predictive monitoring</p>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { icon: Shield, label: 'Claims Avoided', val: '24' },
                   { icon: Clock, label: 'Early Warning', val: '6.4h' },
                   { icon: Leaf, label: 'Carbon Saved', val: '1.2kT' },
                   { icon: TrendingDown, label: 'Waste %', val: '-18%' },
                 ].map(({ icon: Icon, label, val }) => (
-                  <div key={label} className="bg-white/5 rounded-2xl p-3 border border-white/5">
-                    <Icon className="w-4 h-4 text-primary opacity-70 mb-2" />
-                    <p className="text-lg font-bold text-white">{val}</p>
-                    <p className="text-[10px] text-gray-500 uppercase">{label}</p>
+                  <div key={label} className="bg-slate-50 rounded-2xl p-3 border border-slate-200/80">
+                    <Icon className="w-4 h-4 text-teal-600 mb-1" />
+                    <p className="text-lg font-black text-slate-900">{val}</p>
+                    <p className="text-[10px] text-slate-400 uppercase font-bold">{label}</p>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-          <div className="bg-dark-card rounded-3xl p-6 border border-blue-500/10 flex flex-col justify-center text-center">
-             <div className="mx-auto w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mb-4 text-blue-400">
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col justify-center text-center">
+             <div className="mx-auto w-16 h-16 bg-sky-50 border border-sky-100 rounded-full flex items-center justify-center mb-4 text-sky-600 shadow-2xs">
                 <TrendingUp className="w-8 h-8" />
              </div>
-             <p className="text-3xl font-bold gradient-text">18.2%</p>
-             <p className="text-sm text-gray-400 mt-1">Operational Efficiency Boost</p>
-             <div className="mt-6 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                <motion.div initial={{ width: 0 }} animate={{ width: '18.2%' }} className="h-full bg-blue-600" />
+             <p className="text-3xl font-black text-sky-700">18.2%</p>
+             <p className="text-sm text-slate-500 font-medium mt-1">Operational Efficiency Boost</p>
+             <div className="mt-6 h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <motion.div initial={{ width: 0 }} animate={{ width: '18.2%' }} className="h-full bg-sky-600" />
              </div>
-             <p className="text-[10px] text-gray-500 mt-4 uppercase font-bold tracking-widest text-blue-400/50">Verified by Edge Intelligence Engine</p>
+             <p className="text-[10px] text-slate-400 mt-4 uppercase font-bold tracking-widest">Verified by Shipboard Network Intelligence Engine</p>
           </div>
         </div>
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-dark-card rounded-3xl p-6 border border-white/5">
-            <h3 className="text-sm font-bold text-gray-400 mb-6 flex items-center gap-2 uppercase tracking-wide">
-              <Package className="w-4 h-4" /> Container Health Distribution
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-700 mb-6 flex items-center gap-2 uppercase tracking-wide">
+              <Package className="w-4 h-4 text-teal-600" /> Container Health Distribution
             </h3>
             <div className="h-80 relative">
                <Doughnut data={statusDist} options={{ ...commonOptions, cutout: '75%' }} />
                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <p className="text-3xl font-bold">{containers.length}</p>
-                  <p className="text-[10px] text-gray-500 uppercase">Fleet Size</p>
+                  <p className="text-3xl font-black text-slate-900">{containers.length}</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-bold">Fleet Size</p>
                </div>
             </div>
           </div>
 
-          <div className="bg-dark-card rounded-3xl p-6 border border-white/5">
-            <h3 className="text-sm font-bold text-gray-400 mb-6 flex items-center gap-2 uppercase tracking-wide">
-              <AlertTriangle className="w-4 h-4" /> Root Cause of Incidents
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-700 mb-6 flex items-center gap-2 uppercase tracking-wide">
+              <AlertTriangle className="w-4 h-4 text-amber-500" /> Root Cause of Incidents
             </h3>
             <div className="h-80">
               <Bar 
                 data={{
                   labels: ['Cooling Failure', 'Ambient Spike', 'Vibration', 'Power Loss'],
-                  datasets: [{ data: [12, 19, 3, 5], backgroundColor: 'rgba(0, 212, 170, 0.4)', borderColor: '#00d4aa', borderWidth: 1, borderRadius: 8 }]
+                  datasets: [{ data: [12, 19, 3, 5], backgroundColor: 'rgba(13, 148, 136, 0.5)', borderColor: '#0d9488', borderWidth: 1, borderRadius: 8 }]
                 }} 
                 options={commonOptions} 
               />
@@ -185,11 +170,11 @@ const AnalyticsPage = () => {
               { title: 'Anomaly Detected', body: 'Unit DPW-1024C showed high-frequency vibration during docking, indicating potential mechanical wear in the cooling fan.' },
               { title: 'ROI Analysis', body: 'Predictive alerting prevented 3 critical spoilage events last week, protecting $920,000 in cargo value.' }
             ].map(insight => (
-              <div key={insight.title} className="p-5 rounded-2xl bg-white/3 border border-white/5 hover:border-blue-500/20 transition-all">
-                <p className="text-xs font-bold text-blue-400 mb-2 flex items-center gap-2 underline underline-offset-4 decoration-blue-500/30">
+              <div key={insight.title} className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-teal-200 transition-all">
+                <p className="text-xs font-bold text-teal-700 mb-2 flex items-center gap-2">
                    <Shield className="w-3.5 h-3.5" /> {insight.title.toUpperCase()}
                 </p>
-                <p className="text-sm text-gray-400 leading-relaxed">{insight.body}</p>
+                <p className="text-sm text-slate-600 leading-relaxed font-medium">{insight.body}</p>
               </div>
             ))}
         </div>

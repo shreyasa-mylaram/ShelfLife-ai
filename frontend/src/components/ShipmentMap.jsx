@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 
 // Using Leaflet via CDN - no API key needed, completely free
 const CONTAINER_LOCATIONS = [
@@ -15,153 +15,232 @@ const STATUS_COLORS = {
   critical: '#ef4444',
 };
 
-const ShipmentMap = ({ containers }) => {
+const ShipmentMap = ({ containers, blockedZone, rerouteData, selectedRouteId }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const layerGroupRef = useRef(null);
+  const isInitializedRef = useRef(false);
 
-  useEffect(() => {
-    // Inject Leaflet CSS if not already present
-    if (!document.getElementById('leaflet-css')) {
-      const link = document.createElement('link');
-      link.id = 'leaflet-css';
-      link.rel = 'stylesheet';
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(link);
+  // Memoized function that draws all dynamic layers
+  const updateLayers = useCallback(() => {
+    const L = window.L;
+    const map = mapInstanceRef.current;
+    const layerGroup = layerGroupRef.current;
+    if (!L || !map || !layerGroup) return;
+
+    // Clear ALL dynamic layers before re-adding
+    layerGroup.clearLayers();
+
+    // Merge live containers prop with fallback locations
+    const locData = (containers && containers.length > 0)
+      ? CONTAINER_LOCATIONS.map(base => {
+          const live = containers.find(c => c.id === base.id);
+          return live ? { 
+            ...base, 
+            status: live.status, 
+            prediction: live.prediction, 
+            temp: live.temp,
+            confidence: live.confidence || 94
+          } : base;
+        })
+      : CONTAINER_LOCATIONS;
+
+    locData.forEach(container => {
+      const color = STATUS_COLORS[container.status] || '#10b981';
+
+      // Pulsing circle icon with confidence glow
+      const pulse = L.divIcon({
+        className: '',
+        html: `
+          <div style="position:relative;width:24px;height:24px;">
+            <div style="
+              position:absolute;top:0;left:0;width:24px;height:24px;
+              border-radius:50%;background:${color};opacity:0.25;
+              animation:pulse 2s infinite;"></div>
+            <div style="
+              position:absolute;top:4px;left:4px;width:16px;height:16px;
+              border-radius:50%;background:${color};border:2px solid #fff;
+              box-shadow:0 0 10px ${color};"></div>
+          </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      });
+
+      const marker = L.marker([container.lat, container.lng], { icon: pulse });
+      marker.bindPopup(`
+        <div style="background:#ffffff;color:#0f172a;padding:14px;border-radius:16px;min-width:210px;font-family:Inter,sans-serif;border:1px solid #e2e8f0;box-shadow:0 10px 25px rgba(0,0,0,0.08);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+             <span style="font-weight:900;font-size:14px;color:#0f172a;letter-spacing:-0.5px;">📦 ${container.id}</span>
+             <span style="font-size:10px;color:#0d9488;font-weight:800;background:#f0fdfa;padding:2px 6px;border-radius:6px;border:1px solid #99f6e4;">AI ACTIVE</span>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:4px;"> Cargo: <b style="color:#0f172a;">${container.cargo}</b></div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:8px;">📍 ${container.location}</div>
+          
+          <div style="border-top:1px solid #f1f5f9;padding-top:8px;">
+             <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                <span style="color:#64748b;font-weight:600;">Health Index</span>
+                <span style="color:#059669;font-weight:800;">${container.confidence || 94}% Confidence</span>
+             </div>
+             <div style="height:4px;width:100%;background:#f1f5f9;border-radius:99px;overflow:hidden;">
+                <div style="height:100%;width:${container.confidence || 94}%;background:#059669;"></div>
+             </div>
+          </div>
+        </div>
+      `, { closeButton: false });
+      layerGroup.addLayer(marker);
+
+      // Draw Red "Predictive Breach Arcs" for containers in risk
+      if (container.status !== 'normal') {
+          const offsetLat = container.lat + (container.status === 'critical' ? 0.8 : 0.4);
+          const offsetLng = container.lng + (container.status === 'critical' ? 1.2 : 0.6);
+          
+          const breachLine = L.polyline([[container.lat, container.lng], [offsetLat, offsetLng]], {
+              color: '#e11d48',
+              weight: 3,
+              opacity: 0.8,
+              dashArray: '5, 8',
+              className: 'predictive-path',
+              interactive: false
+          });
+          layerGroup.addLayer(breachLine);
+
+          // Add "Predictive Zone" circle
+          const zone = L.circle([offsetLat, offsetLng], {
+              color: '#e11d48',
+              fillColor: '#ffe4e6',
+              fillOpacity: 0.25,
+              radius: 40000,
+              weight: 1
+          });
+          layerGroup.addLayer(zone);
+      }
+    });
+
+    // Default Shipping Channel
+    const coords = locData.map(c => [c.lat, c.lng]);
+    const channelLine = L.polyline(coords, {
+      color: '#0d9488',
+      weight: 2,
+      opacity: 0.35,
+      dashArray: '8, 12',
+    });
+    layerGroup.addLayer(channelLine);
+
+    // Geopolitical Blocked Chokepoint Hazard Zone Overlay
+    if (blockedZone && blockedZone.polygon && blockedZone.polygon.length > 0) {
+      const hazardPoly = L.polygon(blockedZone.polygon, {
+        color: '#ef4444',
+        fillColor: '#ef4444',
+        fillOpacity: 0.35,
+        weight: 2,
+        dashArray: '4, 6'
+      });
+
+      hazardPoly.bindTooltip(`⚠️ ${blockedZone.name || 'WAR RISK / BLOCKED CHOKEPOINT'}`, {
+        permanent: true,
+        direction: 'center',
+        className: 'bg-rose-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md border-0'
+      });
+      layerGroup.addLayer(hazardPoly);
+
+      // Auto-center towards hazard zone
+      try {
+        map.panTo(blockedZone.polygon[0], { animate: true });
+      } catch (e) { /* ignore */ }
     }
 
-    // Load Leaflet JS only once
+    // Alternate Reroute Lines
+    if (rerouteData && rerouteData.length > 0) {
+      rerouteData.forEach(route => {
+        const isSelected = selectedRouteId ? route.id === selectedRouteId : route.recommended;
+        const polyline = L.polyline(route.waypoints, {
+          color: route.color || (isSelected ? '#0d9488' : '#64748b'),
+          weight: isSelected ? 4 : 2,
+          opacity: isSelected ? 0.9 : 0.45,
+          dashArray: isSelected ? '6, 8' : '4, 4',
+        });
+
+        polyline.bindPopup(`
+          <div style="font-family: sans-serif; min-width: 160px;">
+            <div style="font-weight: 700; font-size: 13px; color: #0f172a; margin-bottom: 4px;">${route.name}</div>
+            <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">${route.description}</div>
+            <div style="display: flex; gap: 8px; font-size: 11px;">
+              <span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">+${route.extra_days}d ETA</span>
+              <span style="background: #fef2f2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-weight: 600;">+${route.spoilage_risk_delta}% Risk</span>
+            </div>
+          </div>
+        `);
+        layerGroup.addLayer(polyline);
+      });
+    }
+  }, [containers, blockedZone, rerouteData, selectedRouteId]);
+
+  // UseEffect #1: Initialize the map ONCE — never destroy on prop changes
+  useEffect(() => {
+    if (isInitializedRef.current) return;
+
     const initMap = () => {
-      if (!window.L || mapInstanceRef.current) return;
+      if (!window.L || !mapRef.current) return;
       const L = window.L;
 
+      // Prevent double-init
+      if (mapInstanceRef.current) return;
+      isInitializedRef.current = true;
+
       const map = L.map(mapRef.current, {
-        center: [15, 85],
-        zoom: 4,
+        center: [15, 80],
+        zoom: 3,
         zoomControl: true,
         attributionControl: true,
       });
 
-      // Dark nautical tile layer
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+      // Free OpenStreetMap tile layer (no API key required)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 18,
       }).addTo(map);
 
-      // Merge live containers prop with fallback locations
-      const locData = (containers && containers.length > 0)
-        ? CONTAINER_LOCATIONS.map(base => {
-            const live = containers.find(c => c.id === base.id);
-            return live ? { 
-              ...base, 
-              status: live.status, 
-              prediction: live.prediction, 
-              temp: live.temp,
-              confidence: live.confidence || 94
-            } : base;
-          })
-        : CONTAINER_LOCATIONS;
-
-      locData.forEach(container => {
-        const color = STATUS_COLORS[container.status] || '#10b981';
-
-        // Pulsing circle icon with confidence glow
-        const pulse = L.divIcon({
-          className: '',
-          html: `
-            <div style="position:relative;width:24px;height:24px;">
-              <div style="
-                position:absolute;top:0;left:0;width:24px;height:24px;
-                border-radius:50%;background:${color};opacity:0.25;
-                animation:pulse 2s infinite;"></div>
-              <div style="
-                position:absolute;top:4px;left:4px;width:16px;height:16px;
-                border-radius:50%;background:${color};border:2px solid #fff;
-                box-shadow:0 0 12px ${color};"></div>
-            </div>
-          `,
-          iconSize: [24, 24],
-          iconAnchor: [12, 12],
-        });
-
-        const marker = L.marker([container.lat, container.lng], { icon: pulse }).addTo(map);
-        marker.bindPopup(`
-          <div style="background:#0a2b3e;color:#fff;padding:12px;border-radius:12px;min-width:200px;font-family:Inter,sans-serif;border:1px solid ${color}44;">
-            <div style="display:flex;justify-between;align-center;margin-bottom:8px;">
-               <span style="font-weight:900;font-size:14px;color:#fff;letter-spacing:-0.5px;">📦 ${container.id}</span>
-               <span style="margin-left:auto;font-size:10px;color:#00d4aa;font-weight:900;">AI ACTIVE</span>
-            </div>
-            <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;"> Cargo: <b style="color:white;">${container.cargo}</b></div>
-            <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📍 ${container.location}</div>
-            
-            <div style="border-top:1px solid #1e3a4e;padding-top:8px;">
-               <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
-                  <span>Health Index</span>
-                  <span style="color:#10b981;font-weight:800;">${container.confidence || 94}% Confidence</span>
-               </div>
-               <div style="height:3px;width:100%;background:#1e3a4e;border-radius:99px;overflow:hidden;">
-                  <div style="height:100%;width:${container.confidence || 94}%;background:#10b981;"></div>
-               </div>
-            </div>
-          </div>
-        `, { closeButton: false });
-
-        // Step 3 Feature: Draw Red "Predictive Breach Arcs" for containers in risk
-        if (container.status !== 'normal') {
-            // Predict a 100km "Deviation" path
-            const offsetLat = container.lat + (container.status === 'critical' ? 0.8 : 0.4);
-            const offsetLng = container.lng + (container.status === 'critical' ? 1.2 : 0.6);
-            
-            L.polyline([[container.lat, container.lng], [offsetLat, offsetLng]], {
-                color: '#ef4444',
-                weight: 3,
-                opacity: 0.8,
-                dashArray: '5, 8',
-                className: 'predictive-path',
-                interactive: false
-            }).addTo(map);
-
-            // Add "Predictive Zone" circle
-            L.circle([offsetLat, offsetLng], {
-                color: '#ef4444',
-                fillColor: '#ef4444',
-                fillOpacity: 0.1,
-                radius: 40000,
-                weight: 1
-            }).addTo(map);
-        }
-      });
-
-      // Default Shipping Channel
-      const coords = locData.map(c => [c.lat, c.lng]);
-      L.polyline(coords, {
-        color: '#00d4aa',
-        weight: 1.5,
-        opacity: 0.25,
-        dashArray: '8, 12',
-      }).addTo(map);
-
       mapInstanceRef.current = map;
+      layerGroupRef.current = L.layerGroup().addTo(map);
+
+      // Draw initial layers
+      updateLayers();
     };
 
     if (window.L) {
       initMap();
     } else {
-      const script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.onload = initMap;
-      document.body.appendChild(script);
+      const checkTimer = setInterval(() => {
+        if (window.L) {
+          clearInterval(checkTimer);
+          initMap();
+        }
+      }, 100);
+      return () => clearInterval(checkTimer);
     }
 
+    // Cleanup only on component UNMOUNT
     return () => {
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        try {
+          mapInstanceRef.current.remove();
+        } catch (e) { /* ignore removal errors */ }
         mapInstanceRef.current = null;
+        layerGroupRef.current = null;
+        isInitializedRef.current = false;
       }
     };
-  }, [containers]); // Re-render when containers update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // UseEffect #2: Update layers when props change (map stays alive)
+  useEffect(() => {
+    updateLayers();
+  }, [updateLayers]);
 
   return (
-    <div className="relative border border-white/5 shadow-2xl glass rounded-3xl" style={{ overflow: 'hidden', height: '400px' }}>
+    <div className="relative border border-slate-200 shadow-sm bg-white rounded-3xl" style={{ overflow: 'hidden', height: '400px' }}>
       {/* Pulse animation style */}
       <style>{`
         @keyframes pulse {
@@ -184,34 +263,37 @@ const ShipmentMap = ({ containers }) => {
       `}</style>
 
       {/* Map header overlay */}
-      <div className="flex items-center gap-3" style={{
+      <div className="flex items-center gap-2.5" style={{
         position: 'absolute', top: 16, left: 16, zIndex: 1000,
-        background: 'rgba(10,43,62,0.85)',
+        background: 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(12px)',
-        padding: '10px 18px',
-        borderRadius: '16px',
-        border: '1px solid rgba(0,212,170,0.3)',
-        color: '#fff',
-        fontSize: '13px',
+        padding: '8px 16px',
+        borderRadius: '14px',
+        border: '1px solid #e2e8f0',
+        color: '#0f172a',
+        fontSize: '12px',
+        fontWeight: '700',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
       }}>
-        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-        <span className="font-bold tracking-tighter uppercase">Predictive Route Overlays</span>
+        <div className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
+        <span className="tracking-tight uppercase text-slate-800">Predictive Route Overlays</span>
       </div>
 
        {/* AI Confidence Meter */}
        <div style={{
         position: 'absolute', top: 16, right: 16, zIndex: 1000,
-        background: 'rgba(10,43,62,0.85)',
+        background: 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(12px)',
-        padding: '10px 18px',
-        borderRadius: '16px',
-        border: '1px solid rgba(255,255,255,0.1)',
-        color: '#00d4aa',
+        padding: '8px 16px',
+        borderRadius: '14px',
+        border: '1px solid #e2e8f0',
+        color: '#0d9488',
         fontSize: '11px',
-        fontWeight: '900',
-        letterSpacing: '0.1em'
+        fontWeight: '800',
+        letterSpacing: '0.05em',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
       }}>
-        <span style={{ color: '#94a3b8' }}>AI CONFIDENCE:</span> 94.2%
+        <span style={{ color: '#64748b' }}>AI CONFIDENCE:</span> 94.2%
       </div>
 
       <div ref={mapRef} style={{ width: '100%', height: '100%' }} />

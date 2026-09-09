@@ -51,7 +51,7 @@ const initialContainers = [
   { id: "DPW-1024B", temp: 3.8, threshold: 5.0, warnThreshold: 4.0, status: "warning", prediction: 4.5, cargo: "fresh_produce", cargoLabel: "Fresh Produce", cargoIcon: "🥦", location: "Indian Ocean", humidity: 68, battery: 92, light_lux: 25, syncStatus: "pending", healthScore: 70, breachInHours: 5, shelfDays: 10, lightAlert: true },
   { id: "DPW-1024C", temp: 5.2, threshold: 3.0, warnThreshold: 2.5, status: "critical", prediction: 6.8, cargo: "seafood", cargoLabel: "Seafood", cargoIcon: "🐟", location: "DPW Mumbai Terminal", humidity: 72, battery: 45, light_lux: 0, syncStatus: "pending", healthScore: 32, breachInHours: null, shelfDays: 7 },
   { id: "DPW-1024D", temp: 1.8, threshold: 3.0, warnThreshold: 2.5, status: "normal", prediction: 2.2, cargo: "vaccines", cargoLabel: "Vaccines", cargoIcon: "💉", location: "South China Sea", humidity: 38, battery: 94, light_lux: 15, syncStatus: "synced", healthScore: 95, breachInHours: null, shelfDays: 45 },
-  { id: "DPW-1024E", temp: 3.2, threshold: 4.0, warnThreshold: 3.5, status: "normal", prediction: 3.9, cargo: "dairy", cargoLabel: "Dairy", cargoIcon: "🥛", location: "Offline Mode - Dead Zone", humidity: 55, battery: 76, light_lux: 0, syncStatus: "pending", healthScore: 78, breachInHours: null, shelfDays: 12 },
+  { id: "DPW-1024E", temp: 3.2, threshold: 4.0, warnThreshold: 3.5, status: "normal", prediction: 3.9, cargo: "dairy", cargoLabel: "Dairy", cargoIcon: "🥛", location: "Strait of Malacca", humidity: 55, battery: 76, light_lux: 0, syncStatus: "synced", healthScore: 78, breachInHours: null, shelfDays: 12 },
 ];
 
 const initialAuditLogs = [
@@ -132,17 +132,32 @@ export const ContainerProvider = ({ children }) => {
        const prefix = alert.severity === 'CRITICAL' ? '🔴 CRITICAL' : '⚠️ WARNING';
        
        // Real-time Dashboard Pop-up
-       toast[noteType](`${prefix} | ${alert.message}`, {
-         duration: 6000,
-         style: {
-           background: '#1e2f3a',
-           color: '#e0e4e8',
-           border: `1px solid ${noteType === 'error' ? '#ef4444' : '#f59e0b'}`,
-           borderRadius: '16px',
-           fontSize: '12px',
-           fontWeight: 'bold',
-         }
-       });
+       if (noteType === 'error') {
+         toast.error(`${prefix} | ${alert.message}`, {
+           duration: 6000,
+           style: {
+             background: '#ffffff',
+             color: '#0f172a',
+             border: '1px solid #fecdd3',
+             borderRadius: '16px',
+             fontSize: '12px',
+             fontWeight: 'bold',
+           }
+         });
+       } else {
+         toast(`${prefix} | ${alert.message}`, {
+           icon: '⚠️',
+           duration: 6000,
+           style: {
+             background: '#ffffff',
+             color: '#0f172a',
+             border: '1px solid #fde68a',
+             borderRadius: '16px',
+             fontSize: '12px',
+             fontWeight: 'bold',
+           }
+         });
+       }
 
        addNotification(`📡 HUB ALERT: ${alert.message}`, noteType);
     });
@@ -185,17 +200,17 @@ export const ContainerProvider = ({ children }) => {
 
   const forceSync = () => {
     if (!isOnline) {
-      addNotification("❌ Currently in connectivity dead zone. Data stored locally in SQLite. Will sync when container enters DP World port.", "error");
+      addNotification("📡 Satellite uplink standby. Operating seamlessly over Vessel Local Area Network.", "info");
       return;
     }
     if (pendingSyncCount > 0) {
       setPendingSyncCount(0);
       setContainers(prev => prev.map(c => ({ ...c, syncStatus: "synced" })));
       setLastSyncTime(new Date().toLocaleTimeString());
-      addNotification(`📡 Syncing data to DP World Cloud...\n✅ Full audit trail uploaded. Certificate of Quality generated.`, "success");
-      setAuditLogs(prev => [{ timestamp: new Date().toLocaleString(), container: "SYSTEM", temp: "--", status: "Cloud Sync Complete" }, ...prev]);
+      addNotification(`🚢 Telemetry synced across Ship LAN to Fleet Control.\n✅ Full voyage audit trail logged.`, "success");
+      setAuditLogs(prev => [{ timestamp: new Date().toLocaleString(), container: "SYSTEM", temp: "--", status: "Ship LAN Telemetry Synced" }, ...prev]);
     } else {
-      addNotification("✅ All data synced. No pending offline records.", "success");
+      addNotification("✅ Ship LAN database up to date.", "success");
     }
   };
 
@@ -203,14 +218,13 @@ export const ContainerProvider = ({ children }) => {
     setIsOnline(prev => {
       const newState = !prev;
       if (newState) {
-        addNotification("📶 Connectivity restored. Container entering DP World terminal. Ready to sync audit trail.", "success");
-        setAuditLogs(logs => [{ timestamp: new Date().toLocaleString(), container: "SYSTEM", temp: "--", status: "Network: Connection Restored" }, ...logs]);
+        addNotification("📡 Satellite link active. Fleet control synchronized with Ship LAN.", "success");
+        setAuditLogs(logs => [{ timestamp: new Date().toLocaleString(), container: "SYSTEM", temp: "--", status: "Network: Satellite Link Active" }, ...logs]);
         setTimeout(() => forceSync(), 2000);
       } else {
-        addNotification("🌊 Entering connectivity dead zone. Edge AI Engine active. All data saved locally in SQLite.", "warning");
-        setPendingSyncCount(prev => prev + containers.length);
-        setContainers(prev => prev.map(c => ({ ...c, syncStatus: "pending" })));
-        setAuditLogs(logs => [{ timestamp: new Date().toLocaleString(), container: "SYSTEM", temp: "--", status: "Network: Dead Zone Entered" }, ...logs]);
+        addNotification("🚢 Operating on Vessel Local Area Network (Shipboard Intranet).", "info");
+        setPendingSyncCount(0);
+        setAuditLogs(logs => [{ timestamp: new Date().toLocaleString(), container: "SYSTEM", temp: "--", status: "Network: Vessel LAN Mode" }, ...logs]);
       }
       return newState;
     });

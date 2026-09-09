@@ -1,8 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, BarChart3, Package, Settings, Menu, X } from 'lucide-react';
 import { ContainerProvider } from './context/ContainerContext';
 import DashboardPage from './pages/DashboardPage';
 import DetailPage from './pages/DetailPage';
@@ -12,13 +11,14 @@ import Header from './components/Header';
 import './index.css';
 
 import Sidebar from './components/Sidebar';
+import RightSidebar from './components/RightSidebar';
 
 function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark to-dark/90 flex overflow-hidden">
+    <div className="min-h-screen bg-[#f8f9fc] text-slate-800 flex overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -27,21 +27,21 @@ function AppContent() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 lg:hidden"
           />
         )}
       </AnimatePresence>
 
-      {/* Sidebar - Desktop and Mobile */}
+      {/* Primary Left Navigation Sidebar */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 w-64 z-50 transform transition-transform duration-300 ease-in-out
+        fixed lg:static inset-y-0 left-0 w-64 z-50 transform transition-transform duration-300 ease-in-out shrink-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <Sidebar onClose={() => setIsSidebarOpen(false)} />
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative">
+      {/* Main Content Workspace */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative bg-[#f8f9fc]">
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1">
           <AnimatePresence mode="wait">
@@ -54,6 +54,9 @@ function AppContent() {
           </AnimatePresence>
         </main>
       </div>
+
+      {/* Right Tactical Ops Sidebar (Hidden on smaller viewports, visible on desktop) */}
+      <RightSidebar />
     </div>
   );
 }
@@ -68,23 +71,27 @@ function App() {
           toastOptions={{
             duration: 4000,
             style: {
-              background: '#1e2f3a',
-              color: '#e0e4e8',
-              border: '1px solid #00d4aa',
+              background: '#ffffff',
+              color: '#0f172a',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.08)',
+              fontWeight: '600',
+              fontSize: '13px',
+              borderRadius: '12px',
             },
             success: {
               iconTheme: {
-                primary: '#00d4aa',
-                secondary: '#0a2b3e',
+                primary: '#10b981',
+                secondary: '#ecfdf5',
               },
             },
             error: {
               style: {
-                border: '1px solid #ef4444',
+                border: '1px solid #fecdd3',
               },
               iconTheme: {
-                primary: '#ef4444',
-                secondary: '#0a2b3e',
+                primary: '#e11d48',
+                secondary: '#fff1f2',
               },
             },
           }}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useContainers } from '../context/ContainerContext';
 import { useLocation } from 'react-router-dom';
-import { History, CheckCircle, AlertCircle, Download, Search, Shield } from 'lucide-react';
+import { History, CheckCircle, AlertCircle, Download, Search } from 'lucide-react';
 
 const AuditTrail = ({ filterContainerId, dashboardFilter = 'all' }) => {
   const { auditLogs } = useContainers();
@@ -74,13 +74,13 @@ const AuditTrail = ({ filterContainerId, dashboardFilter = 'all' }) => {
   const getStatusColor = (status) => {
     switch(status.toLowerCase()) {
       case 'normal':
-        return 'text-green-500 bg-green-500/10 border-green-500';
+        return 'text-emerald-700 bg-emerald-50 border-emerald-200';
       case 'warning':
-        return 'text-yellow-500 bg-yellow-500/10 border-yellow-500';
+        return 'text-amber-800 bg-amber-50 border-amber-200';
       case 'critical':
-        return 'text-red-500 bg-red-500/10 border-red-500';
+        return 'text-rose-800 bg-rose-50 border-rose-200';
       default:
-        return 'text-primary bg-primary/10 border-primary';
+        return 'text-teal-800 bg-teal-50 border-teal-200';
     }
   };
   
@@ -88,64 +88,64 @@ const AuditTrail = ({ filterContainerId, dashboardFilter = 'all' }) => {
     <div>
       <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
         <div className="flex items-center gap-3">
-          <History className="w-6 h-6 text-primary" />
-          <h2 className="text-xl font-semibold">Immutable Audit Trail | Freshness Evidence</h2>
+          <History className="w-6 h-6 text-teal-600" />
+          <h2 className="text-xl font-bold text-slate-900">Immutable Audit Trail | Freshness Evidence</h2>
         </div>
         
         <div className="flex gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               placeholder="Search by container or status..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-dark-card border border-gray-600 rounded-lg text-sm focus:outline-none focus:border-primary transition-colors"
+              className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:border-teal-600 shadow-2xs transition-colors"
             />
           </div>
           <div className="flex flex-col items-end gap-1">
             <button 
               onClick={handleExport}
-              className="px-4 py-2 bg-dark-card border border-gray-600 rounded-lg text-sm hover:border-primary transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-2xs"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-4 h-4 text-teal-600" />
               Export Signed Report
             </button>
-            <div className="text-[10px] font-black text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">
+            <div className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                ✓ TRUST VERIFIED
             </div>
           </div>
         </div>
       </div>
       
-      <div className="bg-dark-card rounded-2xl overflow-hidden border border-gray-700">
+      <div className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-dark-lighter">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary">Timestamp</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary">Container ID</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary">Temperature</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary">Storage Proof</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Timestamp</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Container ID</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Temperature</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Storage Proof</th>
               </tr>
             </thead>
             <tbody>
               {filteredLogs.map((log, index) => (
-                <tr key={index} className="border-b border-gray-700 hover:bg-dark-lighter/50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-gray-300">{log.timestamp}</td>
-                  <td className="px-6 py-4 text-sm font-mono text-primary">{log.container}</td>
-                  <td className="px-6 py-4 text-sm font-semibold">{log.temp}°C</td>
+                <tr key={index} className="border-b border-slate-100 hover:bg-slate-50/70 transition-colors">
+                  <td className="px-6 py-4 text-sm text-slate-600 font-medium">{log.timestamp}</td>
+                  <td className="px-6 py-4 text-sm font-mono font-bold text-teal-700">{log.container}</td>
+                  <td className="px-6 py-4 text-sm font-bold text-slate-900">{log.temp}°C</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold border ${getStatusColor(log.status)}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusColor(log.status)}`}>
                       {getStatusIcon(log.status)}
                       {log.status}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sm text-green-500">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Stored Locally (SQLite)</span>
+                    <div className="flex items-center gap-2 text-sm text-sky-700 font-semibold">
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
+                      <span>Vessel LAN DB (SQLite)</span>
                     </div>
                   </td>
                 </tr>
@@ -155,15 +155,15 @@ const AuditTrail = ({ filterContainerId, dashboardFilter = 'all' }) => {
         </div>
         
         {filteredLogs.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            <History className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No audit records found</p>
+          <div className="text-center py-12 text-slate-400">
+            <History className="w-12 h-12 mx-auto mb-3 opacity-30 text-teal-600" />
+            <p className="font-medium">No audit records found</p>
           </div>
         )}
       </div>
       
-      <div className="mt-4 text-center text-xs text-gray-500">
-        <p>🔒 Immutable records stored in local SQLite database | Tamper-proof freshness evidence for high-value cargo</p>
+      <div className="mt-4 text-center text-xs text-slate-400 font-medium">
+        <p>🔒 Immutable records recorded over Shipboard Local Area Network | Tamper-proof freshness evidence for maritime voyages</p>
       </div>
     </div>
   );

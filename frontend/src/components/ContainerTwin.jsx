@@ -5,9 +5,7 @@ import {
   PerspectiveCamera, 
   Environment, 
   Float, 
-  MeshDistortMaterial, 
-  ContactShadows,
-  Html
+  ContactShadows
 } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -65,34 +63,34 @@ const ContainerBody = ({ temp, threshold }) => {
 
 const ContainerTwin = ({ temp, threshold, containerId }) => {
   return (
-    <div className="w-full h-[400px] bg-dark-lighter/30 rounded-3xl overflow-hidden relative border border-white/5 shadow-inner">
+    <div className="w-full h-[400px] bg-gradient-to-br from-slate-50 to-white rounded-3xl overflow-hidden relative border border-slate-200 shadow-xs">
       {/* 3D Neural Scan Overlay UI */}
       <div className="absolute top-6 left-6 z-10 pointer-events-none">
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Digital Twin Active</span>
-          <h3 className="text-xl font-bold text-white font-mono">{containerId}</h3>
-          <div className="flex items-center gap-2 mt-2">
-            <div className={`w-2 h-2 rounded-full ${temp > threshold ? 'bg-red-500 animate-ping' : 'bg-primary'}`} />
-            <span className="text-xs font-bold text-gray-400">TELEMETRY SYNCED</span>
+          <span className="text-[10px] font-black text-teal-700 uppercase tracking-[0.2em] bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/80 w-fit">Digital Twin Active</span>
+          <h3 className="text-xl font-bold text-slate-900 font-mono mt-1">{containerId}</h3>
+          <div className="flex items-center gap-2 mt-1">
+            <div className={`w-2 h-2 rounded-full ${temp > threshold ? 'bg-rose-500 animate-ping' : 'bg-teal-500'}`} />
+            <span className="text-xs font-bold text-slate-500">TELEMETRY SYNCED</span>
           </div>
         </div>
       </div>
 
       <div className="absolute bottom-6 right-6 z-10 pointer-events-none text-right">
-        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Internal Core Temp</span>
-        <p className={`text-3xl font-black ${temp > threshold ? 'text-red-500' : 'text-primary'}`}>{temp.toFixed(1)}°C</p>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Internal Core Temp</span>
+        <p className={`text-3xl font-black ${temp > threshold ? 'text-rose-600' : 'text-teal-700'}`}>{temp.toFixed(1)}°C</p>
       </div>
 
       <Canvas shadows dpr={[1, 2]}>
         <PerspectiveCamera makeDefault position={[5, 3, 5]} fov={35} />
-        <ambientLight intensity={0.5} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
+        <ambientLight intensity={0.7} />
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.2} castShadow />
         
         <Float speed={1.5} rotationIntensity={0.5} floatIntensity={0.5}>
           <ContainerBody temp={temp} threshold={threshold} />
         </Float>
 
-        <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={10} blur={2.5} far={4} />
+        <ContactShadows position={[0, -1.5, 0]} opacity={0.25} scale={10} blur={2.5} far={4} />
         <Environment preset="city" />
         <OrbitControls 
           enableZoom={false} 
@@ -103,12 +101,12 @@ const ContainerTwin = ({ temp, threshold, containerId }) => {
         />
       </Canvas>
 
-      {/* CSS-based Grid background for high-tech feel */}
+      {/* CSS-based Grid background for light tech feel */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-20"
+        className="absolute inset-0 pointer-events-none opacity-40"
         style={{
-          backgroundImage: `linear-gradient(#ffffff05 1px, transparent 1px), linear-gradient(90deg, #ffffff05 1px, transparent 1px)`,
-          backgroundSize: '20px 20px'
+          backgroundImage: `linear-gradient(#0000000a 1px, transparent 1px), linear-gradient(90deg, #0000000a 1px, transparent 1px)`,
+          backgroundSize: '24px 24px'
         }}
       />
     </div>
