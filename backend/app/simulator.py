@@ -103,7 +103,9 @@ async def run_live_simulation():
                         "humidity": round(random.uniform(38, 80), 1),
                         "vibration": round(random.uniform(0.05, 1.5), 2),
                         "cooling_power": int(random.uniform(45, 100)),
-                        "days_in_transit": round(random.uniform(1.0, 20.0), 1)
+                        "days_in_transit": round(random.uniform(1.0, 20.0), 1),
+                        # Simulated light photoperiod (e.g. produce gets oscillating day/night or occasional darkness fault)
+                        "light_lux": round(random.choice([0.0, 15.0, 180.0, 240.0, 320.0]), 1) if container == "DPW-1024B" else round(random.uniform(80, 250), 1)
                     }
 
                     response = await client.post(

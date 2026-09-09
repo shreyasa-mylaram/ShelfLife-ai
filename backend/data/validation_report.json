@@ -1,0 +1,52 @@
+{
+  "status": "WARNING",
+  "overall_quality_score": 60.4,
+  "total_records": 203001,
+  "checks": {
+    "required_columns_present": {
+      "passed": true,
+      "missing": []
+    },
+    "duplicate_timestamps": {
+      "passed": false,
+      "count": 23000
+    },
+    "temperature_within_range": {
+      "passed": true,
+      "out_of_bounds_count": 0,
+      "range_celsius": "[-5.0, 40.0]"
+    },
+    "humidity_within_range": {
+      "passed": true,
+      "out_of_bounds_count": 0,
+      "range_percent": "[0.0, 100.0]"
+    },
+    "vibration_non_negative": {
+      "passed": true,
+      "negative_count": 0
+    },
+    "product_type_valid": {
+      "passed": false,
+      "invalid_types": [
+        "2.0",
+        "0.0",
+        "1.0"
+      ],
+      "allowed_types": [
+        "mangoes",
+        "vaccines",
+        "seafood",
+        "electronics",
+        "pharma",
+        "biologics",
+        "fresh_produce",
+        "dairy"
+      ]
+    }
+  },
+  "shipment_quality_summary": {
+    "total_records_evaluated": 203001,
+    "completeness_average_percent": 60.4,
+    "records_meeting_80_percent_standard": 0
+  }
+}

@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 import {
   ArrowLeft, Thermometer, Droplets, Battery, MapPin,
   Package, AlertTriangle, Brain, Download, RefreshCw,
-  Activity, Shield, Clock, TrendingUp, Ship, Zap, Radio
+  Activity, Shield, Clock, TrendingUp, Ship, Zap, Radio, Sun, Lightbulb, Eye
 } from 'lucide-react';
 import { CHART_COLORS } from '../utils/constants';
 import ContainerTwin from '../components/ContainerTwin';
@@ -213,6 +213,33 @@ const DetailPage = () => {
           </div>
         </motion.div>
 
+        {/* Light Deficiency Alert Banner if food needs light but has been in continuous darkness */}
+        {container.lightAlert && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-6 p-4 rounded-2xl bg-yellow-500/10 border border-yellow-500/30 flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.1)]"
+          >
+            <Sun className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5 animate-pulse" />
+            <div className="flex-1">
+              <h4 className="text-sm font-bold text-yellow-300 uppercase tracking-wider flex items-center gap-2">
+                ⚠️ Photoperiod Alert: Light Exposure Required
+              </h4>
+              <p className="text-xs text-gray-300 mt-1">
+                {container.cargoLabel || container.cargo} cargo requires periodic light exposure during transit. 
+                Prolonged continuous darkness detected (<span className="text-yellow-400 font-bold">{container.light_lux ?? 0} Lux</span> &lt; 50 Lux minimum for &gt;12 hours). 
+                Risk of premature decay or uneven ripening.
+              </p>
+              <div className="mt-2 text-[11px] text-yellow-400 font-semibold flex items-center gap-1.5">
+                <span>Action: Activate internal container grow lamps / inspect lighting unit.</span>
+              </div>
+            </div>
+            <span className="px-2 py-1 rounded-md bg-yellow-500/20 text-yellow-300 text-[10px] font-black uppercase">
+              12H+ DARKNESS
+            </span>
+          </motion.div>
+        )}
+
         {/* Digital Twin + Stats Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
            {/* 3D Digital Twin - Spans 5 cols */}
@@ -228,8 +255,15 @@ const DetailPage = () => {
            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <StatCard icon={Thermometer} iconColor="#ef4444" label="Temperature" value={formatTemperature(container.temp)} sub={`Limit: ${formatTemperature(container.threshold)}`} trend="-0.2°C/h" />
               <StatCard icon={Droplets} iconColor="#3b82f6" label="Humidity" value={formatHumidity(container.humidity)} sub="RH Control Active" />
+              <StatCard 
+                icon={Sun} 
+                iconColor={container.light_lux < 50 && container.needsLight ? "#f59e0b" : "#eab308"} 
+                label="Light Exposure" 
+                value={`${container.light_lux ?? 150} Lux`} 
+                sub={container.needsLight ? (container.light_lux >= 50 ? "✓ Photoperiod Healthy (≥50 Lux)" : "⚠ Insufficient Light (<50 Lux)") : "Dark Storage Optimal"} 
+                trend={container.needsLight && container.light_lux < 50 ? "12h+ Dark" : undefined}
+              />
               <StatCard icon={Battery} iconColor="#10b981" label="Cooling Eff." value={`${container.battery ?? 85}%`} sub="Solar Hybrid Active" />
-              <StatCard icon={Brain} iconColor="#a78bfa" label="AI 6h Projection" value={formatTemperature(container.prediction)} sub={isOverThreshold ? '⚠ BREACH LIKELY' : '✓ TRAJECTORY STABLE'} />
            </div>
         </div>
 
@@ -263,7 +297,11 @@ const DetailPage = () => {
                     <div className="space-y-4 mb-8">
                        <HealthGauge label="Cargo Integrity" value={healthScore} icon={Package} />
                        <HealthGauge label="Electrical Stability" value={88} icon={Zap} />
-                       <HealthGauge label="Seal Integrity" value={99} icon={Lock} />
+                       <HealthGauge 
+                          label={container.needsLight ? "Photoperiod Index" : "Storage Light Protection"} 
+                          value={container.needsLight ? Math.min(100, Math.round(((container.light_lux ?? 150) / 100) * 100)) : (container.light_lux < 50 ? 98 : 65)} 
+                          icon={Sun} 
+                        />
                     </div>
                  </div>
 

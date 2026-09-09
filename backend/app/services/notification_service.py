@@ -31,7 +31,12 @@ class NotificationService:
         self.twilio_phone = os.getenv("TWILIO_PHONE_NUMBER", "+13613044298")
         
         # Mock mode
-        self.mock_mode = os.getenv("MOCK_NOTIFICATIONS", "false").lower() == "true"
+        placeholder = ("your_email@gmail.com", "your_app_password_here", "")
+        self.mock_mode = (
+            os.getenv("MOCK_NOTIFICATIONS", "false").lower() == "true"
+            or self.smtp_user in placeholder
+            or self.smtp_password in placeholder
+        )
         
         # Initialize Twilio client if credentials exist
         self.twilio_client = None

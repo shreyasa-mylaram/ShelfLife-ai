@@ -63,6 +63,7 @@ export const useShipmentData = (containerId = null) => {
           temp: r.temperature,
           humidity: r.humidity,
           cooling: r.cooling_power,
+          light_lux: r.light_lux ?? 150.0,
         }));
         setHistory(mappedHistory);
 
@@ -70,6 +71,9 @@ export const useShipmentData = (containerId = null) => {
         const latest = readings[0] || {};
         const prediction = forecastTemp(readings.slice().reverse());
         const { health, remaining } = calcHealth(shipment.product_type, readings);
+
+        const currentLux = latest.light_lux ?? 150.0;
+        const needsLight = ['fresh_produce', 'mangoes', 'produce', 'fruits'].some(t => (shipment.product_type || '').toLowerCase().includes(t));
 
         setData({
           id: shipment.container_id,
@@ -81,6 +85,9 @@ export const useShipmentData = (containerId = null) => {
           humidity: parseFloat((latest.humidity ?? 55).toFixed(1)),
           battery: parseFloat((latest.cooling_power ?? 85).toFixed(1)),
           vibration: parseFloat((latest.vibration ?? 0).toFixed(3)),
+          light_lux: parseFloat(currentLux.toFixed(1)),
+          needsLight,
+          lightAlert: needsLight && currentLux < 50.0,
           threshold: 4.0,
           status: getStatus(latest.temperature ?? 3.5),
           prediction,

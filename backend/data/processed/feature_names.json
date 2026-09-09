@@ -1,0 +1,21 @@
+{
+  "features": [
+    "temperature",
+    "humidity",
+    "vibration",
+    "cooling_power",
+    "product_type_encoded",
+    "temperature_rolling_mean",
+    "temperature_rolling_std",
+    "temperature_slope",
+    "humidity_to_temp_ratio",
+    "cumulative_exposure",
+    "temperature_spike_count",
+    "cooling_efficiency",
+    "lag_1",
+    "lag_3",
+    "lag_6"
+  ],
+  "num_features": 15,
+  "target": "failure"
+}

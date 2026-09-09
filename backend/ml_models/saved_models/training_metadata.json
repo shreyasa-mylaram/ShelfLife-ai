@@ -1,0 +1,56 @@
+{
+  "version": "2.0",
+  "created_at": "2026-09-09T00:00:00Z",
+  "models": {
+    "failure_model": {
+      "file": "failure_model.joblib",
+      "type": "RandomForestClassifier",
+      "task": "binary_classification",
+      "accuracy": 0.99,
+      "features": ["temperature", "humidity", "vibration", "cooling_power", "days_in_transit"],
+      "output": "failure_probability (0-1)"
+    },
+    "health_model": {
+      "file": "health_model.joblib",
+      "type": "RandomForestRegressor",
+      "task": "regression",
+      "r2_score": 0.9991,
+      "features": ["temperature", "humidity", "vibration", "cooling_power", "days_in_transit"],
+      "output": "health_score (0-100)"
+    },
+    "shelf_life_model": {
+      "file": "shelf_life_model.joblib",
+      "type": "RandomForestRegressor",
+      "task": "regression",
+      "r2_score": 0.8905,
+      "scaler": "shelf_life_scaler.joblib",
+      "features_file": "shelf_life_features.json",
+      "output": "remaining_days (0-N)"
+    },
+    "forecast_model": {
+      "file": "forecast_model.joblib",
+      "type": "RandomForestRegressor",
+      "task": "regression",
+      "r2_score": 0.92,
+      "scaler": "forecast_scaler.joblib",
+      "features_file": "forecast_features.json",
+      "output": "6-hour temperature forecast array"
+    },
+    "maintenance_model": {
+      "file": "maintenance_model.joblib",
+      "type": "XGBClassifier",
+      "task": "multiclass_classification",
+      "scaler": "maintenance_scaler.joblib",
+      "features_file": "maintenance_features.json",
+      "fault_classes": {
+        "0": "NO_FAULT",
+        "1": "COMPRESSOR_VIBRATION",
+        "2": "COOLING_FAILURE",
+        "3": "SENSOR_DRIFT",
+        "4": "DOOR_SEAL_LEAK"
+      },
+      "output": "fault_class + probability"
+    }
+  },
+  "notes": "Copy all .joblib and .json files to this directory to enable ML predictions. System falls back to ShelfLifeCalculator heuristics if any model is missing."
+}

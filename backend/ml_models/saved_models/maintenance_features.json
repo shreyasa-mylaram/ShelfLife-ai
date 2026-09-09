@@ -1,0 +1,14 @@
+[
+  "temperature",
+  "suction_pressure",
+  "discharge_pressure",
+  "compressor_cycles",
+  "humidity",
+  "runtime_hours",
+  "power_consumption",
+  "condenser_temp",
+  "evaporator_temp",
+  "refrigerant_pressure",
+  "oil_pressure",
+  "vibration"
+]

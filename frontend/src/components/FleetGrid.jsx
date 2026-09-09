@@ -1,7 +1,7 @@
 import React from 'react';
 import { useContainers } from '../context/ContainerContext';
 import { Link } from 'react-router-dom';
-import { Thermometer, Droplets, Zap, MapPin, Brain, Ship, AlertTriangle, CloudOff, Clock } from 'lucide-react';
+import { Thermometer, Droplets, Zap, MapPin, Brain, Ship, AlertTriangle, CloudOff, Clock, Sun } from 'lucide-react';
 
 // Circular SVG health ring
 const HealthRing = ({ score, size = 56 }) => {
@@ -104,6 +104,11 @@ const FleetGrid = ({ filter = 'all' }) => {
                   <p className="text-xs text-gray-400 mt-0.5 capitalize">{container.cargoLabel || container.cargo}</p>
                 </div>
                 <div className="flex items-center gap-2">
+                  {container.lightAlert && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-500/15 text-yellow-300 border border-yellow-500/30 flex items-center gap-1 animate-pulse" title="Insufficient Light Exposure">
+                      <Sun className="w-3 h-3 text-yellow-400" /> Light Alert
+                    </span>
+                  )}
                   {container.syncStatus === 'pending' && (
                     <span className="px-2 py-0.5 rounded-full text-xs bg-orange-500/15 text-orange-400 border border-orange-500/30 flex items-center gap-1">
                       <CloudOff className="w-3 h-3" /> Edge

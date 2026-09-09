@@ -45,7 +45,8 @@ async def sync_offline_data(
             door_open=data.get("door_open", False),
             latitude=data.get("latitude", 0),
             longitude=data.get("longitude", 0),
-            days_in_transit=data.get("days_in_transit", 0)
+            days_in_transit=data.get("days_in_transit", 0),
+            light_lux=data.get("light_lux", 150.0)
         )
         db.add(reading)
         

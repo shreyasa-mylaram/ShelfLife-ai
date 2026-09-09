@@ -12,11 +12,11 @@ export const useContainers = () => {
 
 // Cargo-specific thresholds and shelf life (matches DP World pitch)
 const CARGO_CONFIG = {
-  pharmaceuticals: { threshold: 4.0, shelfDays: 30, icon: '💊', warnThreshold: 3.5, color: '#3b82f6' }, // Blue
-  fresh_produce:   { threshold: 5.0, shelfDays: 10, icon: '🥦', warnThreshold: 4.0, color: '#10b981' }, // Green
-  seafood:         { threshold: 3.0, shelfDays: 7,  icon: '🐟', warnThreshold: 2.5, color: '#f43f5e' }, // Rose/Red
-  vaccines:        { threshold: 3.0, shelfDays: 45, icon: '💉', warnThreshold: 2.5, color: '#8b5cf6' }, // Purple
-  dairy:           { threshold: 4.0, shelfDays: 12, icon: '🥛', warnThreshold: 3.5, color: '#f59e0b' }, // Amber
+  pharmaceuticals: { threshold: 4.0, shelfDays: 30, icon: '💊', warnThreshold: 3.5, color: '#3b82f6', needsLight: false }, // Blue
+  fresh_produce:   { threshold: 5.0, shelfDays: 10, icon: '🥦', warnThreshold: 4.0, color: '#10b981', needsLight: true, minLux: 50 }, // Green: Requires light
+  seafood:         { threshold: 3.0, shelfDays: 7,  icon: '🐟', warnThreshold: 2.5, color: '#f43f5e', needsLight: false }, // Rose/Red
+  vaccines:        { threshold: 3.0, shelfDays: 45, icon: '💉', warnThreshold: 2.5, color: '#8b5cf6', needsLight: false }, // Purple
+  dairy:           { threshold: 4.0, shelfDays: 12, icon: '🥛', warnThreshold: 3.5, color: '#f59e0b', needsLight: false }, // Amber
 };
 
 // Compute a live health score 0-100 from temp, threshold, and cooling
@@ -47,11 +47,11 @@ const predictBreachAtEdge = (temp, threshold, history = []) => {
 };
 
 const initialContainers = [
-  { id: "DPW-1024A", temp: 2.3, threshold: 4.0, warnThreshold: 3.5, status: "normal", prediction: 3.1, cargo: "pharmaceuticals", cargoLabel: "Pharmaceuticals", cargoIcon: "💊", location: "Arabian Sea", humidity: 45, battery: 87, syncStatus: "synced", healthScore: 92, breachInHours: null, shelfDays: 30 },
-  { id: "DPW-1024B", temp: 3.8, threshold: 5.0, warnThreshold: 4.0, status: "warning", prediction: 4.5, cargo: "fresh_produce", cargoLabel: "Fresh Produce", cargoIcon: "🥦", location: "Indian Ocean", humidity: 68, battery: 92, syncStatus: "pending", healthScore: 70, breachInHours: 5, shelfDays: 10 },
-  { id: "DPW-1024C", temp: 5.2, threshold: 3.0, warnThreshold: 2.5, status: "critical", prediction: 6.8, cargo: "seafood", cargoLabel: "Seafood", cargoIcon: "🐟", location: "DPW Mumbai Terminal", humidity: 72, battery: 45, syncStatus: "pending", healthScore: 32, breachInHours: null, shelfDays: 7 },
-  { id: "DPW-1024D", temp: 1.8, threshold: 3.0, warnThreshold: 2.5, status: "normal", prediction: 2.2, cargo: "vaccines", cargoLabel: "Vaccines", cargoIcon: "💉", location: "South China Sea", humidity: 38, battery: 94, syncStatus: "synced", healthScore: 95, breachInHours: null, shelfDays: 45 },
-  { id: "DPW-1024E", temp: 3.2, threshold: 4.0, warnThreshold: 3.5, status: "normal", prediction: 3.9, cargo: "dairy", cargoLabel: "Dairy", cargoIcon: "🥛", location: "Offline Mode - Dead Zone", humidity: 55, battery: 76, syncStatus: "pending", healthScore: 78, breachInHours: null, shelfDays: 12 },
+  { id: "DPW-1024A", temp: 2.3, threshold: 4.0, warnThreshold: 3.5, status: "normal", prediction: 3.1, cargo: "pharmaceuticals", cargoLabel: "Pharmaceuticals", cargoIcon: "💊", location: "Arabian Sea", humidity: 45, battery: 87, light_lux: 120, syncStatus: "synced", healthScore: 92, breachInHours: null, shelfDays: 30 },
+  { id: "DPW-1024B", temp: 3.8, threshold: 5.0, warnThreshold: 4.0, status: "warning", prediction: 4.5, cargo: "fresh_produce", cargoLabel: "Fresh Produce", cargoIcon: "🥦", location: "Indian Ocean", humidity: 68, battery: 92, light_lux: 25, syncStatus: "pending", healthScore: 70, breachInHours: 5, shelfDays: 10, lightAlert: true },
+  { id: "DPW-1024C", temp: 5.2, threshold: 3.0, warnThreshold: 2.5, status: "critical", prediction: 6.8, cargo: "seafood", cargoLabel: "Seafood", cargoIcon: "🐟", location: "DPW Mumbai Terminal", humidity: 72, battery: 45, light_lux: 0, syncStatus: "pending", healthScore: 32, breachInHours: null, shelfDays: 7 },
+  { id: "DPW-1024D", temp: 1.8, threshold: 3.0, warnThreshold: 2.5, status: "normal", prediction: 2.2, cargo: "vaccines", cargoLabel: "Vaccines", cargoIcon: "💉", location: "South China Sea", humidity: 38, battery: 94, light_lux: 15, syncStatus: "synced", healthScore: 95, breachInHours: null, shelfDays: 45 },
+  { id: "DPW-1024E", temp: 3.2, threshold: 4.0, warnThreshold: 3.5, status: "normal", prediction: 3.9, cargo: "dairy", cargoLabel: "Dairy", cargoIcon: "🥛", location: "Offline Mode - Dead Zone", humidity: 55, battery: 76, light_lux: 0, syncStatus: "pending", healthScore: 78, breachInHours: null, shelfDays: 12 },
 ];
 
 const initialAuditLogs = [
@@ -113,6 +113,8 @@ export const ContainerProvider = ({ children }) => {
                 temp: data.temp, 
                 humidity: data.humidity, 
                 battery: data.battery,
+                light_lux: data.light_lux !== undefined ? data.light_lux : c.light_lux,
+                lightAlert: (cfg.needsLight && data.light_lux !== undefined && data.light_lux < (cfg.minLux || 50)),
                 status: newStatus,
                 prediction,
                 breachInHours,

@@ -33,6 +33,7 @@ class SensorReadingBase(BaseModel):
     latitude: float = 0.0
     longitude: float = 0.0
     days_in_transit: float = 0.0
+    light_lux: Optional[float] = 150.0
 
 class SensorReadingCreate(SensorReadingBase):
     timestamp: datetime

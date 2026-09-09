@@ -17,6 +17,7 @@ from app.models.sensor import SensorReading
 Base.metadata.create_all(bind=engine)
 
 CONTAINERS = [
+    {"container_id": "CONT-001",  "product_type": "fresh_produce",   "journey_days": 10},
     {"container_id": "DPW-1024A", "product_type": "pharmaceuticals", "journey_days": 15},
     {"container_id": "DPW-1024B", "product_type": "fresh_produce",   "journey_days": 8},
     {"container_id": "DPW-1024C", "product_type": "seafood",         "journey_days": 6},

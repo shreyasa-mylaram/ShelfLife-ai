@@ -1,0 +1,672 @@
+{
+  "datasets": {
+    "cold_chain_silent_failure.csv": {
+      "rows": 8000,
+      "columns": [
+        "shipment_id",
+        "transit_days",
+        "door_opens",
+        "temp_mean_c",
+        "temp_max_c",
+        "temp_min_c",
+        "temp_std_c",
+        "temp_recovery_rate",
+        "rh_mean",
+        "rh_std",
+        "rh_max",
+        "package_type",
+        "product_volume_l",
+        "fill_ratio",
+        "carrier_id",
+        "origin_zone",
+        "dest_zone",
+        "leg_count",
+        "sensor_gap_hours",
+        "vibration_index",
+        "feature_x1",
+        "feature_x2",
+        "feature_x3",
+        "silent_failure"
+      ],
+      "data_types": {
+        "shipment_id": "object",
+        "transit_days": "float64",
+        "door_opens": "int64",
+        "temp_mean_c": "float64",
+        "temp_max_c": "float64",
+        "temp_min_c": "float64",
+        "temp_std_c": "float64",
+        "temp_recovery_rate": "float64",
+        "rh_mean": "float64",
+        "rh_std": "float64",
+        "rh_max": "float64",
+        "package_type": "int64",
+        "product_volume_l": "float64",
+        "fill_ratio": "float64",
+        "carrier_id": "int64",
+        "origin_zone": "int64",
+        "dest_zone": "int64",
+        "leg_count": "int64",
+        "sensor_gap_hours": "float64",
+        "vibration_index": "float64",
+        "feature_x1": "float64",
+        "feature_x2": "float64",
+        "feature_x3": "int64",
+        "silent_failure": "int64"
+      },
+      "missing_values": {
+        "shipment_id": 0,
+        "transit_days": 0,
+        "door_opens": 0,
+        "temp_mean_c": 0,
+        "temp_max_c": 0,
+        "temp_min_c": 0,
+        "temp_std_c": 0,
+        "temp_recovery_rate": 64,
+        "rh_mean": 0,
+        "rh_std": 0,
+        "rh_max": 334,
+        "package_type": 0,
+        "product_volume_l": 0,
+        "fill_ratio": 0,
+        "carrier_id": 0,
+        "origin_zone": 0,
+        "dest_zone": 0,
+        "leg_count": 0,
+        "sensor_gap_hours": 0,
+        "vibration_index": 0,
+        "feature_x1": 0,
+        "feature_x2": 0,
+        "feature_x3": 0,
+        "silent_failure": 0
+      },
+      "numerical_summary": {
+        "transit_days": {
+          "count": 8000.0,
+          "mean": 3.99774625,
+          "std": 2.956571940113342,
+          "min": 0.5,
+          "25%": 1.821,
+          "50%": 3.137,
+          "75%": 4.783250000000001,
+          "max": 17.332
+        },
+        "door_opens": {
+          "count": 8000.0,
+          "mean": 8.803,
+          "std": 6.171098063263401,
+          "min": 0.0,
+          "25%": 4.0,
+          "50%": 7.0,
+          "75%": 13.0,
+          "max": 36.0
+        },
+        "temp_mean_c": {
+          "count": 8000.0,
+          "mean": 4.293705624999999,
+          "std": 1.7201766364754358,
+          "min": -1.672,
+          "25%": 3.22975,
+          "50%": 4.117,
+          "75%": 5.20725,
+          "max": 12.146
+        },
+        "temp_max_c": {
+          "count": 8000.0,
+          "mean": 5.823055999999999,
+          "std": 2.458287046861004,
+          "min": -1.383,
+          "25%": 4.18,
+          "50%": 5.277,
+          "75%": 7.11125,
+          "max": 19.377
+        },
+        "temp_min_c": {
+          "count": 8000.0,
+          "mean": 3.49168175,
+          "std": 1.7340394950341327,
+          "min": -4.331,
+          "25%": 2.43375,
+          "50%": 3.4775,
+          "75%": 4.409,
+          "max": 12.111
+        },
+        "temp_std_c": {
+          "count": 8000.0,
+          "mean": 1.269175875,
+          "std": 0.6975933586300367,
+          "min": 0.001,
+          "25%": 0.706,
+          "50%": 1.1165,
+          "75%": 1.723,
+          "max": 4.224
+        },
+        "temp_recovery_rate": {
+          "count": 7936.0,
+          "mean": 0.44263006552419354,
+          "std": 0.1395204651110267,
+          "min": 0.0103,
+          "25%": 0.3476,
+          "50%": 0.4436,
+          "75%": 0.537525,
+          "max": 0.8925
+        },
+        "rh_mean": {
+          "count": 8000.0,
+          "mean": 0.5140304125,
+          "std": 0.10003299042679151,
+          "min": 0.2191,
+          "25%": 0.4446,
+          "50%": 0.50285,
+          "75%": 0.57385,
+          "max": 0.9076
+        },
+        "rh_std": {
+          "count": 8000.0,
+          "mean": 0.068401575,
+          "std": 0.036694979870723995,
+          "min": 0.0001,
+          "25%": 0.0412,
+          "50%": 0.0614,
+          "75%": 0.0903,
+          "max": 0.294
+        },
+        "rh_max": {
+          "count": 7666.0,
+          "mean": 0.6214400600052178,
+          "std": 0.14647861644623844,
+          "min": 0.2396,
+          "25%": 0.5144,
+          "50%": 0.59365,
+          "75%": 0.70895,
+          "max": 0.99
+        },
+        "package_type": {
+          "count": 8000.0,
+          "mean": 0.689875,
+          "std": 0.7759012419226767,
+          "min": 0.0,
+          "25%": 0.0,
+          "50%": 0.0,
+          "75%": 1.0,
+          "max": 2.0
+        },
+        "product_volume_l": {
+          "count": 8000.0,
+          "mean": 12.033425000000001,
+          "std": 3.9309476991053494,
+          "min": 0.08,
+          "25%": 9.4,
+          "50%": 12.04,
+          "75%": 14.69,
+          "max": 29.28
+        },
+        "fill_ratio": {
+          "count": 8000.0,
+          "mean": 0.7171523999999999,
+          "std": 0.14470957066386528,
+          "min": 0.1855,
+          "25%": 0.61995,
+          "50%": 0.72035,
+          "75%": 0.8192,
+          "max": 1.0
+        },
+        "carrier_id": {
+          "count": 8000.0,
+          "mean": 5.5225,
+          "std": 3.4716351019779084,
+          "min": 0.0,
+          "25%": 3.0,
+          "50%": 5.0,
+          "75%": 9.0,
+          "max": 11.0
+        },
+        "origin_zone": {
+          "count": 8000.0,
+          "mean": 2.46025,
+          "std": 1.7134138177521092,
+          "min": 0.0,
+          "25%": 1.0,
+          "50%": 2.0,
+          "75%": 4.0,
+          "max": 5.0
+        },
+        "dest_zone": {
+          "count": 8000.0,
+          "mean": 2.48525,
+          "std": 1.7133736876916867,
+          "min": 0.0,
+          "25%": 1.0,
+          "50%": 2.0,
+          "75%": 4.0,
+          "max": 5.0
+        },
+        "leg_count": {
+          "count": 8000.0,
+          "mean": 1.722625,
+          "std": 0.7353609343975105,
+          "min": 1.0,
+          "25%": 1.0,
+          "50%": 2.0,
+          "75%": 2.0,
+          "max": 3.0
+        },
+        "sensor_gap_hours": {
+          "count": 8000.0,
+          "mean": 0.789991625,
+          "std": 0.7928065588999872,
+          "min": 0.0,
+          "25%": 0.22475,
+          "50%": 0.549,
+          "75%": 1.09125,
+          "max": 6.0
+        },
+        "vibration_index": {
+          "count": 8000.0,
+          "mean": 1.8349707375,
+          "std": 0.9313061935653749,
+          "min": 0.004,
+          "25%": 1.1734,
+          "50%": 1.77925,
+          "75%": 2.424575,
+          "max": 5.8171
+        },
+        "feature_x1": {
+          "count": 8000.0,
+          "mean": -0.0032452499999999986,
+          "std": 1.0016931002961111,
+          "min": -3.7285,
+          "25%": -0.67505,
+          "50%": -0.0026,
+          "75%": 0.672975,
+          "max": 4.0865
+        },
+        "feature_x2": {
+          "count": 8000.0,
+          "mean": 0.0014400000000000012,
+          "std": 1.0012640725517283,
+          "min": -4.0319,
+          "25%": -0.665025,
+          "50%": 0.0049499999999999995,
+          "75%": 0.668525,
+          "max": 3.7624
+        },
+        "feature_x3": {
+          "count": 8000.0,
+          "mean": 0.295375,
+          "std": 0.4562396614758387,
+          "min": 0.0,
+          "25%": 0.0,
+          "50%": 0.0,
+          "75%": 1.0,
+          "max": 1.0
+        },
+        "silent_failure": {
+          "count": 8000.0,
+          "mean": 0.19675,
+          "std": 0.397566591779745,
+          "min": 0.0,
+          "25%": 0.0,
+          "50%": 0.0,
+          "75%": 0.0,
+          "max": 1.0
+        }
+      },
+      "categorical_columns": [
+        "shipment_id"
+      ]
+    },
+    "fresh_retail_net_50k.csv": {
+      "rows": 15001,
+      "columns": [
+        "city_id",
+        "store_id",
+        "management_group_id",
+        "first_category_id",
+        "second_category_id",
+        "third_category_id",
+        "product_id",
+        "dt",
+        "sale_amount",
+        "hours_sale",
+        "stock_hour6_22_cnt",
+        "hours_stock_status",
+        "discount",
+        "holiday_flag",
+        "activity_flag",
+        "precpt",
+        "avg_temperature",
+        "avg_humidity",
+        "avg_wind_level"
+      ],
+      "data_types": {
+        "city_id": "int64",
+        "store_id": "int64",
+        "management_group_id": "int64",
+        "first_category_id": "int64",
+        "second_category_id": "int64",
+        "third_category_id": "int64",
+        "product_id": "int64",
+        "dt": "object",
+        "sale_amount": "float64",
+        "hours_sale": "object",
+        "stock_hour6_22_cnt": "int64",
+        "hours_stock_status": "object",
+        "discount": "float64",
+        "holiday_flag": "int64",
+        "activity_flag": "int64",
+        "precpt": "float64",
+        "avg_temperature": "float64",
+        "avg_humidity": "float64",
+        "avg_wind_level": "float64"
+      },
+      "missing_values": {
+        "city_id": 0,
+        "store_id": 0,
+        "management_group_id": 0,
+        "first_category_id": 0,
+        "second_category_id": 0,
+        "third_category_id": 0,
+        "product_id": 0,
+        "dt": 0,
+        "sale_amount": 0,
+        "hours_sale": 0,
+        "stock_hour6_22_cnt": 0,
+        "hours_stock_status": 0,
+        "discount": 0,
+        "holiday_flag": 0,
+        "activity_flag": 0,
+        "precpt": 0,
+        "avg_temperature": 0,
+        "avg_humidity": 0,
+        "avg_wind_level": 0
+      },
+      "numerical_summary": {
+        "city_id": {
+          "count": 15001.0,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "25%": 0.0,
+          "50%": 0.0,
+          "75%": 0.0,
+          "max": 0.0
+        },
+        "store_id": {
+          "count": 15001.0,
+          "mean": 0.5560295980267982,
+          "std": 0.49686732788934557,
+          "min": 0.0,
+          "25%": 0.0,
+          "50%": 1.0,
+          "75%": 1.0,
+          "max": 1.0
+        },
+        "management_group_id": {
+          "count": 15001.0,
+          "mean": 4.470101993200453,
+          "std": 1.8796957332495847,
+          "min": 0.0,
+          "25%": 3.0,
+          "50%": 5.0,
+          "75%": 6.0,
+          "max": 6.0
+        },
+        "first_category_id": {
+          "count": 15001.0,
+          "mean": 15.225251649890007,
+          "std": 9.341698184930554,
+          "min": 0.0,
+          "25%": 4.0,
+          "50%": 16.0,
+          "75%": 21.0,
+          "max": 31.0
+        },
+        "second_category_id": {
+          "count": 15001.0,
+          "mean": 42.36270915272315,
+          "std": 23.087280046958085,
+          "min": 0.0,
+          "25%": 26.0,
+          "50%": 28.0,
+          "75%": 64.0,
+          "max": 81.0
+        },
+        "third_category_id": {
+          "count": 15001.0,
+          "mean": 111.27644823678422,
+          "std": 61.89706647284778,
+          "min": 0.0,
+          "25%": 65.0,
+          "50%": 104.0,
+          "75%": 167.0,
+          "max": 232.0
+        },
+        "product_id": {
+          "count": 15001.0,
+          "mean": 404.50256649556695,
+          "std": 269.06927139693846,
+          "min": 4.0,
+          "25%": 138.0,
+          "50%": 374.0,
+          "75%": 638.0,
+          "max": 858.0
+        },
+        "sale_amount": {
+          "count": 15001.0,
+          "mean": 1.0530164655689622,
+          "std": 1.250110987204283,
+          "min": 0.0,
+          "25%": 0.4,
+          "50%": 0.7,
+          "75%": 1.2,
+          "max": 21.3
+        },
+        "stock_hour6_22_cnt": {
+          "count": 15001.0,
+          "mean": 3.2711152589827344,
+          "std": 4.3951516791552425,
+          "min": 0.0,
+          "25%": 0.0,
+          "50%": 0.0,
+          "75%": 6.0,
+          "max": 16.0
+        },
+        "discount": {
+          "count": 15001.0,
+          "mean": 0.9143723226321966,
+          "std": 0.1130751630500162,
+          "min": 0.419,
+          "25%": 0.851,
+          "50%": 0.984,
+          "75%": 1.0,
+          "max": 1.0
+        },
+        "holiday_flag": {
+          "count": 15001.0,
+          "mean": 0.34451036597560164,
+          "std": 0.4752241877007868,
+          "min": 0.0,
+          "25%": 0.0,
+          "50%": 0.0,
+          "75%": 1.0,
+          "max": 1.0
+        },
+        "activity_flag": {
+          "count": 15001.0,
+          "mean": 0.4001733217785481,
+          "std": 0.4899496266191301,
+          "min": 0.0,
+          "25%": 0.0,
+          "50%": 0.0,
+          "75%": 1.0,
+          "max": 1.0
+        },
+        "precpt": {
+          "count": 15001.0,
+          "mean": 3.138658849410039,
+          "std": 2.973728731506936,
+          "min": 0.2926,
+          "25%": 1.3316,
+          "50%": 2.0522,
+          "75%": 3.1973,
+          "max": 14.2063
+        },
+        "avg_temperature": {
+          "count": 15001.0,
+          "mean": 21.311059262715816,
+          "std": 3.52741703675948,
+          "min": 15.08,
+          "25%": 18.1,
+          "50%": 21.24,
+          "75%": 23.58,
+          "max": 28.01
+        },
+        "avg_humidity": {
+          "count": 15001.0,
+          "mean": 74.13719285380975,
+          "std": 5.206989507006097,
+          "min": 63.07,
+          "25%": 70.26,
+          "50%": 74.26,
+          "75%": 77.42,
+          "max": 86.85
+        },
+        "avg_wind_level": {
+          "count": 15001.0,
+          "mean": 1.640041997200187,
+          "std": 0.22900525081924267,
+          "min": 1.08,
+          "25%": 1.48,
+          "50%": 1.64,
+          "75%": 1.77,
+          "max": 2.25
+        }
+      },
+      "categorical_columns": [
+        "dt",
+        "hours_sale",
+        "hours_stock_status"
+      ]
+    },
+    "nigeria_cold_chain.csv": {
+      "rows": 180000,
+      "columns": [
+        "timestamp",
+        "trip_id",
+        "lat",
+        "lon",
+        "temp_c",
+        "humidity",
+        "door_open",
+        "excursion"
+      ],
+      "data_types": {
+        "timestamp": "object",
+        "trip_id": "object",
+        "lat": "float64",
+        "lon": "float64",
+        "temp_c": "float64",
+        "humidity": "float64",
+        "door_open": "bool",
+        "excursion": "bool"
+      },
+      "missing_values": {
+        "timestamp": 0,
+        "trip_id": 0,
+        "lat": 0,
+        "lon": 0,
+        "temp_c": 0,
+        "humidity": 0,
+        "door_open": 0,
+        "excursion": 0
+      },
+      "numerical_summary": {
+        "lat": {
+          "count": 180000.0,
+          "mean": 8.308166632272222,
+          "std": 2.5983320804589467,
+          "min": 4.181031,
+          "25%": 6.4172655,
+          "50%": 7.549474999999999,
+          "75%": 10.346498,
+          "max": 13.914587
+        },
+        "lon": {
+          "count": 180000.0,
+          "mean": 6.863238299772224,
+          "std": 2.8118973913254393,
+          "min": 2.68545,
+          "25%": 3.970064,
+          "50%": 7.136775500000001,
+          "75%": 8.498040750000001,
+          "max": 14.714698
+        },
+        "temp_c": {
+          "count": 180000.0,
+          "mean": 5.001483166666667,
+          "std": 1.506189846649207,
+          "min": -1.54,
+          "25%": 3.99,
+          "50%": 5.0,
+          "75%": 6.01,
+          "max": 12.33
+        },
+        "humidity": {
+          "count": 180000.0,
+          "mean": 64.98743944444443,
+          "std": 11.959115888980717,
+          "min": 20.0,
+          "25%": 56.9,
+          "50%": 65.0,
+          "75%": 73.1,
+          "max": 100.0
+        }
+      },
+      "categorical_columns": [
+        "timestamp",
+        "trip_id"
+      ]
+    }
+  },
+  "unified_stats": {
+    "total_records": 203001,
+    "product_counts": {
+      "pharma": 193035,
+      "vaccines": 4303,
+      "fresh_produce": 3841,
+      "mangoes": 1552,
+      "dairy": 270
+    },
+    "failure_rate_percent": 12.33,
+    "temperature_stats": {
+      "mean": 6.18,
+      "median": 5.12,
+      "std": 4.62,
+      "min": -1.67,
+      "max": 28.01
+    },
+    "humidity_stats": {
+      "mean": 63.12,
+      "min": 0.22,
+      "max": 100.0
+    },
+    "vibration_stats": {
+      "mean": 0.264,
+      "max": 5.817
+    }
+  },
+  "key_findings": {
+    "primary_failure_driver": "Temperature excursion above product-specific threshold combined with reduced cooling efficiency.",
+    "silent_failure_indicators": "Slight upward temperature drift accompanied by declining cooling power while vibration remains nominal.",
+    "recommended_model_features": [
+      "temperature_rolling_mean",
+      "temperature_slope",
+      "cooling_efficiency",
+      "cumulative_exposure",
+      "lag_1",
+      "lag_3",
+      "lag_6"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "dataset_name": "ShelfLife AI Unified Cold Chain Telemetry",
+  "version": "1.0.0",
+  "total_records": 188180,
+  "total_columns": 12,
+  "source_breakdown": {
+    "nigeria_cold_chain.csv": 180000,
+    "cold_chain_silent_failure.csv": 8000,
+    "fresh_retail_net_50k.csv": 180
+  },
+  "class_distribution": {
+    "non_failure_count (0)": 177964,
+    "failure_count (1)": 10216,
+    "failure_rate_percent": 5.43
+  },
+  "product_distribution": {
+    "pharma": 182415,
+    "vaccines": 4033,
+    "mangoes": 1552,
+    "dairy": 180
+  },
+  "column_descriptions": {
+    "container_id": "Unique identifier for shipping container or reefer unit",
+    "timestamp": "ISO-8601 recording timestamp of sensor observation",
+    "temperature": "Cargo storage temperature in degrees Celsius (\u00b0C)",
+    "humidity": "Relative humidity percentage (% RH)",
+    "vibration": "Vibration intensity index (g-force / acceleration)",
+    "cooling_power": "Compressor/cooling unit power consumption percentage (0-100%)",
+    "door_events": "Binary flag indicating door opening excursion (0=closed, 1=open)",
+    "latitude": "Geographical latitude position of container",
+    "longitude": "Geographical longitude position of container",
+    "product_type": "Perishable cargo classification (vaccines, pharma, seafood, mangoes, dairy, etc.)",
+    "failure": "Ground-truth failure or breach indicator (0=normal, 1=failure/spoiled)",
+    "source": "Origin raw dataset filename"
+  },
+  "quality_metrics": {
+    "duplicate_records_removed": 14821,
+    "missing_values_imputed": true,
+    "schema_conformance": "100%"
+  }
+}

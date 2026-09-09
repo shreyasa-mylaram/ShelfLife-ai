@@ -18,8 +18,6 @@ class InfluxDBManager:
         self.query_api = None
         self.connect()
     
-    def connect(self):
-        """Create InfluxDB connection"""
         try:
             self.client = InfluxDBClient(
                 url=settings.INFLUXDB_URL,
@@ -30,8 +28,7 @@ class InfluxDBManager:
             self.query_api = self.client.query_api()
             logger.info("InfluxDB connected successfully")
         except Exception as e:
-            logger.error(f"InfluxDB connection failed: {e}")
-            raise
+            logger.warning(f"InfluxDB connection failed: {e}. Time-series telemetry logging will operate in fallback mode.")
     
     def write_sensor_data(self, shipment_id: int, data: dict):
         """Write sensor reading to InfluxDB"""

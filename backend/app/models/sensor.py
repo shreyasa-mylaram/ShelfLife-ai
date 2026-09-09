@@ -21,6 +21,7 @@ class SensorReading(Base):
     latitude = Column(Float, default=0.0)
     longitude = Column(Float, default=0.0)
     days_in_transit = Column(Float, default=0.0)
+    light_lux = Column(Float, default=150.0)
     
     # Relationship
     shipment = relationship("Shipment", back_populates="readings")

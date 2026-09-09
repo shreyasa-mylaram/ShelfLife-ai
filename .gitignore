@@ -33,6 +33,7 @@ npm-debug.log
 *.h5
 *.pkl
 *.joblib
+!backend/ml_models/saved_models/*.joblib
 
 # Logs
 *.log
